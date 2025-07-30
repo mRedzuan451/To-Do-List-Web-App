@@ -15,7 +15,7 @@
         <form class="input-section" onsubmit="return false;">
             <div class="input-fields">
                 <label for="task-input" style="display:none;">Task</label>
-                <input type="text" id="task-input" placeholder="Add a new task..." aria-label="Task description">
+                <input type="text" id="task-input" placeholder="Add a new task..." aria-label="Task title">
                 <label for="due-date-input" style="display:none;">Due Date</label>
                 <input type="date" id="due-date-input" aria-label="Due date">
                 <select id="priority-input" aria-label="Priority">
@@ -24,6 +24,11 @@
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                 </select>
+            </div>
+            <div class="input-fields">
+                <textarea id="desc-input" placeholder="Add a description (optional)" aria-label="Task description" rows="1" style="resize:vertical;min-height:32px;"></textarea>
+                <input type="file" id="attach-input" aria-label="Attachment" multiple>
+                <input type="url" id="link-input" placeholder="Attach a link (optional)" aria-label="Attachment link">
             </div>
             <div class="input-buttons">
                 <button id="add-task-btn" type="button">Add</button>

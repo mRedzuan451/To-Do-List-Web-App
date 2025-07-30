@@ -1,3 +1,26 @@
+.input-fields textarea {
+    flex: 2 1 120px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    min-width: 0;
+    margin-bottom: 0.2rem;
+}
+.input-fields input[type="file"] {
+    flex: 1 1 80px;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+.input-fields input[type="url"] {
+    flex: 2 1 120px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    min-width: 0;
+    margin-bottom: 0.2rem;
+}
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f5f6fa;

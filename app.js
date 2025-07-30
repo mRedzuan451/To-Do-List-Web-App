@@ -4,6 +4,9 @@ const dueDateInput = document.getElementById('due-date-input');
 const addTaskBtn = document.getElementById('add-task-btn');
 const clearInputsBtn = document.getElementById('clear-inputs-btn');
 const taskList = document.getElementById('task-list');
+const descInput = document.getElementById('desc-input');
+const attachInput = document.getElementById('attach-input');
+const linkInput = document.getElementById('link-input');
 const priorityInput = document.getElementById('priority-input');
 const taskCount = document.getElementById('task-count');
 const filterBtns = document.querySelectorAll('.filter-btn');
@@ -69,20 +72,30 @@ themeToggle.addEventListener('click', () => setTheme(!document.body.classList.co
 if (localStorage.getItem('theme') === 'dark') setTheme(true);
 
 // Load tasks from localStorage
-function loadTasks() {
-    const saved = localStorage.getItem('tasks');
-    tasks = saved ? JSON.parse(saved) : [];
+function addTask() {
+    const text = taskInput.value.trim();
+    const dueDate = dueDateInput.value;
     const priority = priorityInput ? priorityInput.value : 'none';
-}
-
-// Save tasks to localStorage
-function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-}
-
-// Render tasks (support main task and subtasks)
+    const description = descInput ? descInput.value.trim() : '';
+    const link = linkInput ? linkInput.value.trim() : '';
+    let attachments = [];
+    if (attachInput && attachInput.files && attachInput.files.length > 0) {
+        // Only store file names for demo; real apps should upload or use FileReader
+        attachments = Array.from(attachInput.files).map(f => f.name);
+    }
+    if (!text) return;
+    const newTask = { id: Date.now() + Math.random(), text, completed: false, dueDate, priority, description, link, attachments };
+    if (mainTaskId) newTask.parentId = mainTaskId;
+    tasks.push(newTask);
+    saveTasks();
+    renderTasks();
+    taskInput.value = '';
+    dueDateInput.value = '';
     if (priorityInput) priorityInput.value = 'none';
-function renderTasks() {
+    if (descInput) descInput.value = '';
+    if (linkInput) linkInput.value = '';
+    if (attachInput) attachInput.value = '';
+}
     taskList.innerHTML = '';
     let filtered = tasks;
     if (mainTaskId) {
@@ -128,6 +141,36 @@ function renderTasks() {
         span.addEventListener('keydown', e => {
             if (e.key === 'Enter') e.preventDefault();
         });
+        li.appendChild(span);
+        // Description
+        if (task.description) {
+            const desc = document.createElement('div');
+            desc.className = 'task-desc';
+            desc.textContent = task.description;
+            desc.style.fontSize = '0.95em';
+            desc.style.color = '#666';
+            desc.style.margin = '0.2em 0 0.2em 0.5em';
+            li.appendChild(desc);
+        }
+        // Link
+        if (task.link) {
+            const link = document.createElement('a');
+            link.href = task.link;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = '🔗 Link';
+            link.style.marginLeft = '0.5em';
+            li.appendChild(link);
+        }
+        // Attachments
+        if (task.attachments && task.attachments.length > 0) {
+            const attachDiv = document.createElement('div');
+            attachDiv.className = 'task-attachments';
+            attachDiv.style.fontSize = '0.92em';
+            attachDiv.style.marginLeft = '0.5em';
+            attachDiv.textContent = '📎 ' + task.attachments.join(', ');
+            li.appendChild(attachDiv);
+        }
         // Subtask count/progress and collapsible subtasks
         if (!mainTaskId) {
             const subtasks = tasks.filter(t => t.parentId === task.id);
