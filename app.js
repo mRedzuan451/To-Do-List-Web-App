@@ -2,6 +2,7 @@
 const taskInput = document.getElementById('task-input');
 const dueDateInput = document.getElementById('due-date-input');
 const addTaskBtn = document.getElementById('add-task-btn');
+const clearInputsBtn = document.getElementById('clear-inputs-btn');
 const taskList = document.getElementById('task-list');
 const taskCount = document.getElementById('task-count');
 const filterBtns = document.querySelectorAll('.filter-btn');
@@ -256,6 +257,12 @@ taskInput.addEventListener('keydown', e => {
 });
 dueDateInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') addTask();
+});
+// Clear input fields
+clearInputsBtn.addEventListener('click', () => {
+    taskInput.value = '';
+    dueDateInput.value = '';
+    taskInput.focus();
 });
 
 // Bulk actions

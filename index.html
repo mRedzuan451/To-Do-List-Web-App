@@ -12,11 +12,14 @@
             <h1>To-Do List</h1>
             <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
         </header>
-        <div class="input-section">
+        <form class="input-section" onsubmit="return false;">
+            <label for="task-input" style="display:none;">Task</label>
             <input type="text" id="task-input" placeholder="Add a new task..." aria-label="Task description">
+            <label for="due-date-input" style="display:none;">Due Date</label>
             <input type="date" id="due-date-input" aria-label="Due date">
-            <button id="add-task-btn">Add</button>
-        </div>
+            <button id="add-task-btn" type="button">Add</button>
+            <button id="clear-inputs-btn" type="button" title="Clear inputs">Clear</button>
+        </form>
         <div class="bulk-actions">
             <button id="select-all-btn">Select All</button>
             <button id="delete-selected-btn">Delete Selected</button>
