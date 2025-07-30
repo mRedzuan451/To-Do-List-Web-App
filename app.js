@@ -22,6 +22,7 @@ const confirmYes = document.getElementById('confirm-yes');
 const confirmNo = document.getElementById('confirm-no');
 
 let tasks = [];
+let mainTaskId = null; // Track the current main (parent) task id
 let filter = 'all';
 let selectedTasks = new Set();
 let dragSrcIdx = null;
@@ -77,12 +78,17 @@ function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-// Render tasks
+// Render tasks (support main task and subtasks)
 function renderTasks() {
     taskList.innerHTML = '';
     let filtered = tasks;
-    if (filter === 'active') filtered = tasks.filter(t => !t.completed);
-    if (filter === 'completed') filtered = tasks.filter(t => t.completed);
+    if (mainTaskId) {
+        filtered = tasks.filter(t => t.parentId === mainTaskId);
+    } else {
+        filtered = tasks.filter(t => !t.parentId);
+    }
+    if (filter === 'active') filtered = filtered.filter(t => !t.completed);
+    if (filter === 'completed') filtered = filtered.filter(t => t.completed);
     filtered.forEach((task, idx) => {
         const li = document.createElement('li');
         li.className = 'task-item' + (task.completed ? ' completed' : '') + (selectedTasks.has(task.id) ? ' selected' : '');
@@ -115,6 +121,17 @@ function renderTasks() {
         span.addEventListener('keydown', e => {
             if (e.key === 'Enter') e.preventDefault();
         });
+        // Subtask navigation button
+        const subBtn = document.createElement('button');
+        subBtn.textContent = '▶';
+        subBtn.title = 'View subtasks';
+        subBtn.style.marginRight = '0.5rem';
+        subBtn.addEventListener('click', () => {
+            mainTaskId = task.id;
+            renderTasks();
+        });
+        // Only show subtask button if this is a main task
+        if (!mainTaskId) li.appendChild(subBtn);
         // Due date
         if (task.dueDate) {
             const due = document.createElement('span');
@@ -150,6 +167,14 @@ function renderTasks() {
         li.appendChild(delBtn);
         taskList.appendChild(li);
     });
+    // If viewing subtasks, show a back button
+    if (mainTaskId) {
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '⬅ Back to main tasks';
+        backBtn.style.margin = '1rem 0';
+        backBtn.onclick = () => { mainTaskId = null; renderTasks(); };
+        taskList.prepend(backBtn);
+    }
     updateCount();
     updateProgress();
 }
@@ -181,12 +206,14 @@ function editTask(span, idx) {
     };
 }
 
-// Add task
+// Add task (main or subtask)
 function addTask() {
     const text = taskInput.value.trim();
     const dueDate = dueDateInput.value;
     if (!text) return;
-    tasks.push({ id: Date.now() + Math.random(), text, completed: false, dueDate });
+    const newTask = { id: Date.now() + Math.random(), text, completed: false, dueDate };
+    if (mainTaskId) newTask.parentId = mainTaskId;
+    tasks.push(newTask);
     saveTasks();
     renderTasks();
     taskInput.value = '';
