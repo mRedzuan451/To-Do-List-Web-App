@@ -3,26 +3,59 @@ body {
     background: #f5f6fa;
     margin: 0;
     padding: 0;
+    color: #222;
+    transition: background 0.3s, color 0.3s;
+}
+.dark-mode {
+    background: #181a1b;
+    color: #f5f6fa;
 }
 .todo-app {
     background: #fff;
-    max-width: 400px;
+    max-width: 480px;
     margin: 40px auto;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     padding: 2rem 1.5rem 1.5rem 1.5rem;
+    transition: background 0.3s, color 0.3s;
+}
+.dark-mode .todo-app {
+    background: #23272b;
+    color: #f5f6fa;
+}
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+#theme-toggle {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #4f8cff;
+    border-radius: 50%;
+    padding: 0.3rem 0.5rem;
+    transition: background 0.2s;
+}
+#theme-toggle:hover {
+    background: #e3edff;
 }
 .input-section {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
 }
-#task-input {
+#task-input, #due-date-input {
     flex: 1;
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1rem;
+}
+#due-date-input {
+    max-width: 140px;
 }
 #add-task-btn {
     padding: 0.5rem 1rem;
@@ -36,10 +69,49 @@ body {
 #add-task-btn:hover {
     background: #357ae8;
 }
+.bulk-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+}
+.bulk-actions button {
+    background: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    color: #333;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+.bulk-actions button:hover {
+    background: #e3edff;
+}
+#progress-bar {
+    width: 100%;
+    height: 12px;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    appearance: none;
+    background: #e3edff;
+}
+#progress-bar::-webkit-progress-bar {
+    background: #e3edff;
+    border-radius: 6px;
+}
+#progress-bar::-webkit-progress-value {
+    background: #4f8cff;
+    border-radius: 6px;
+}
+#progress-bar::-moz-progress-bar {
+    background: #4f8cff;
+    border-radius: 6px;
+}
 #task-list {
     list-style: none;
     padding: 0;
     margin: 0 0 1rem 0;
+    min-height: 40px;
 }
 .task-item {
     display: flex;
@@ -48,6 +120,15 @@ body {
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid #f0f0f0;
     transition: background 0.2s;
+    background: transparent;
+    animation: fadeIn 0.3s;
+    user-select: none;
+}
+.task-item.selected {
+    background: #e3edff;
+}
+.dark-mode .task-item.selected {
+    background: #2a3a4a;
 }
 .task-item.completed .task-text {
     text-decoration: line-through;
@@ -56,6 +137,26 @@ body {
 .task-text {
     flex: 1;
     cursor: pointer;
+    outline: none;
+}
+.task-text[contenteditable="true"] {
+    background: #fffbe6;
+    border-radius: 3px;
+    padding: 0 2px;
+    border: 1px dashed #4f8cff;
+}
+.dark-mode .task-text[contenteditable="true"] {
+    background: #23272b;
+    border: 1px dashed #4f8cff;
+}
+.due-date {
+    font-size: 0.85rem;
+    color: #888;
+    margin-left: 0.7rem;
+}
+.overdue {
+    color: #e74c3c;
+    font-weight: bold;
 }
 .delete-btn {
     background: none;
@@ -66,7 +167,7 @@ body {
     opacity: 0;
     transition: opacity 0.2s;
 }
-.task-item:hover .delete-btn {
+.task-item:hover .delete-btn, .task-item.selected .delete-btn {
     opacity: 1;
 }
 .footer {
@@ -88,11 +189,15 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.95rem;
+    transition: background 0.2s;
 }
 .filter-btn.active, .filter-btn:hover {
     background: #e3edff;
 }
-#clear-completed {
+.dark-mode .filter-btn.active, .dark-mode .filter-btn:hover {
+    background: #2a3a4a;
+}
+#clear-completed, #export-tasks, #import-tasks-btn {
     background: none;
     border: none;
     color: #e74c3c;
@@ -100,8 +205,41 @@ body {
     font-size: 0.95rem;
     border-radius: 5px;
     padding: 0.3rem 0.7rem;
+    transition: background 0.2s;
 }
-@media (max-width: 500px) {
+#clear-completed:hover, #export-tasks:hover, #import-tasks-btn:hover {
+    background: #ffeaea;
+}
+.dark-mode #clear-completed, .dark-mode #export-tasks, .dark-mode #import-tasks-btn {
+    color: #ffb3b3;
+}
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: #fff;
+    color: #222;
+    padding: 2rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    min-width: 260px;
+    text-align: center;
+}
+.dark-mode .modal-content {
+    background: #23272b;
+    color: #f5f6fa;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 600px) {
     .todo-app {
         max-width: 98vw;
         padding: 1rem 0.5rem 1rem 0.5rem;

@@ -7,21 +7,42 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="todo-app">
-        <h1>To-Do List</h1>
+    <div class="todo-app" role="main">
+        <header>
+            <h1>To-Do List</h1>
+            <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        </header>
         <div class="input-section">
-            <input type="text" id="task-input" placeholder="Add a new task...">
+            <input type="text" id="task-input" placeholder="Add a new task..." aria-label="Task description">
+            <input type="date" id="due-date-input" aria-label="Due date">
             <button id="add-task-btn">Add</button>
         </div>
-        <ul id="task-list"></ul>
+        <div class="bulk-actions">
+            <button id="select-all-btn">Select All</button>
+            <button id="delete-selected-btn">Delete Selected</button>
+            <button id="complete-selected-btn">Mark Selected Complete</button>
+        </div>
+        <progress id="progress-bar" value="0" max="100" aria-label="Task completion progress"></progress>
+        <ul id="task-list" aria-label="Task list"></ul>
         <div class="footer">
             <span id="task-count">0 tasks left</span>
-            <div class="filters">
+            <div class="filters" role="group" aria-label="Task filters">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="active">Active</button>
                 <button class="filter-btn" data-filter="completed">Completed</button>
             </div>
             <button id="clear-completed">Clear Completed</button>
+            <button id="export-tasks">Export</button>
+            <input type="file" id="import-tasks" style="display:none" accept="application/json">
+            <button id="import-tasks-btn">Import</button>
+        </div>
+        <div id="confirm-dialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" style="display:none">
+            <div class="modal-content">
+                <h2 id="confirm-title">Are you sure?</h2>
+                <p id="confirm-message"></p>
+                <button id="confirm-yes">Yes</button>
+                <button id="confirm-no">No</button>
+            </div>
         </div>
     </div>
     <script src="app.js"></script>
