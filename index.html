@@ -17,6 +17,12 @@
             <input type="text" id="task-input" placeholder="Add a new task..." aria-label="Task description">
             <label for="due-date-input" style="display:none;">Due Date</label>
             <input type="date" id="due-date-input" aria-label="Due date">
+            <select id="priority-input" aria-label="Priority">
+                <option value="none">No Priority</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
             <button id="add-task-btn" type="button">Add</button>
             <button id="clear-inputs-btn" type="button" title="Clear inputs">Clear</button>
         </form>

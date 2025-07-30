@@ -4,6 +4,7 @@ const dueDateInput = document.getElementById('due-date-input');
 const addTaskBtn = document.getElementById('add-task-btn');
 const clearInputsBtn = document.getElementById('clear-inputs-btn');
 const taskList = document.getElementById('task-list');
+const priorityInput = document.getElementById('priority-input');
 const taskCount = document.getElementById('task-count');
 const filterBtns = document.querySelectorAll('.filter-btn');
 const clearCompletedBtn = document.getElementById('clear-completed');
@@ -71,6 +72,7 @@ if (localStorage.getItem('theme') === 'dark') setTheme(true);
 function loadTasks() {
     const saved = localStorage.getItem('tasks');
     tasks = saved ? JSON.parse(saved) : [];
+    const priority = priorityInput ? priorityInput.value : 'none';
 }
 
 // Save tasks to localStorage
@@ -79,6 +81,7 @@ function saveTasks() {
 }
 
 // Render tasks (support main task and subtasks)
+    if (priorityInput) priorityInput.value = 'none';
 function renderTasks() {
     taskList.innerHTML = '';
     let filtered = tasks;
@@ -92,6 +95,10 @@ function renderTasks() {
     filtered.forEach((task, idx) => {
         const li = document.createElement('li');
         li.className = 'task-item' + (task.completed ? ' completed' : '') + (selectedTasks.has(task.id) ? ' selected' : '');
+        // Color/priority
+        if (task.priority && task.priority !== 'none') {
+            li.style.borderLeft = '6px solid ' + (task.priority === 'high' ? '#e74c3c' : task.priority === 'medium' ? '#f1c40f' : '#4f8cff');
+        }
         li.setAttribute('draggable', 'true');
         li.setAttribute('tabindex', '0');
         // Checkbox for selection
@@ -121,17 +128,94 @@ function renderTasks() {
         span.addEventListener('keydown', e => {
             if (e.key === 'Enter') e.preventDefault();
         });
-        // Subtask navigation button
-        const subBtn = document.createElement('button');
-        subBtn.textContent = '▶';
-        subBtn.title = 'View subtasks';
-        subBtn.style.marginRight = '0.5rem';
-        subBtn.addEventListener('click', () => {
-            mainTaskId = task.id;
-            renderTasks();
-        });
-        // Only show subtask button if this is a main task
-        if (!mainTaskId) li.appendChild(subBtn);
+        // Subtask count/progress and collapsible subtasks
+        if (!mainTaskId) {
+            const subtasks = tasks.filter(t => t.parentId === task.id);
+            if (subtasks.length > 0) {
+                const done = subtasks.filter(st => st.completed).length;
+                const subInfo = document.createElement('span');
+                subInfo.style.fontSize = '0.85em';
+                subInfo.style.marginLeft = '0.5em';
+                subInfo.textContent = `(${done}/${subtasks.length} subtasks)`;
+                li.appendChild(subInfo);
+                // Collapsible subtasks
+                let expanded = !!task._expanded;
+                const toggleBtn = document.createElement('button');
+                toggleBtn.textContent = expanded ? '▼' : '▶';
+                toggleBtn.title = expanded ? 'Hide subtasks' : 'Show subtasks';
+                toggleBtn.style.marginRight = '0.5rem';
+                toggleBtn.onclick = () => {
+                    task._expanded = !expanded;
+                    renderTasks();
+                };
+                li.appendChild(toggleBtn);
+                if (expanded) {
+                    subtasks.forEach((sub, subIdx) => {
+                        const subLi = document.createElement('li');
+                        subLi.className = 'task-item subtask' + (sub.completed ? ' completed' : '') + (selectedTasks.has(sub.id) ? ' selected' : '');
+                        subLi.style.marginLeft = '2em';
+                        // Color/priority for subtask
+                        if (sub.priority && sub.priority !== 'none') {
+                            subLi.style.borderLeft = '6px solid ' + (sub.priority === 'high' ? '#e74c3c' : sub.priority === 'medium' ? '#f1c40f' : '#4f8cff');
+                        }
+                        // Selection
+                        const subSelect = document.createElement('input');
+                        subSelect.type = 'checkbox';
+                        subSelect.checked = selectedTasks.has(sub.id);
+                        subSelect.title = 'Select subtask';
+                        subSelect.addEventListener('change', e => {
+                            if (e.target.checked) selectedTasks.add(sub.id);
+                            else selectedTasks.delete(sub.id);
+                            renderTasks();
+                        });
+                        // Completion
+                        const subCheck = document.createElement('input');
+                        subCheck.type = 'checkbox';
+                        subCheck.checked = sub.completed;
+                        subCheck.title = 'Mark subtask complete';
+                        subCheck.addEventListener('change', () => {
+                            sub.completed = !sub.completed;
+                            saveTasks();
+                            // Rollup: if all subtasks complete, mark parent complete
+                            const siblings = tasks.filter(t => t.parentId === task.id);
+                            if (siblings.every(st => st.completed)) task.completed = true;
+                            else task.completed = false;
+                            saveTasks();
+                            renderTasks();
+                        });
+                        // Editable subtask text
+                        const subSpan = document.createElement('span');
+                        subSpan.className = 'task-text';
+                        subSpan.textContent = sub.text;
+                        subSpan.tabIndex = 0;
+                        subSpan.setAttribute('role', 'textbox');
+                        subSpan.setAttribute('aria-label', 'Edit subtask');
+                        subSpan.addEventListener('dblclick', () => editTask(subSpan, tasks.indexOf(sub)));
+                        subSpan.addEventListener('keydown', e => { if (e.key === 'Enter') e.preventDefault(); });
+                        // Due date
+                        if (sub.dueDate) {
+                            const due = document.createElement('span');
+                            due.className = 'due-date' + (isOverdue(sub.dueDate, sub.completed) ? ' overdue' : '');
+                            due.textContent = `Due: ${sub.dueDate}`;
+                            subLi.appendChild(due);
+                        }
+                        // Delete button
+                        const subDelBtn = document.createElement('button');
+                        subDelBtn.className = 'delete-btn';
+                        subDelBtn.innerHTML = '🗑️';
+                        subDelBtn.title = 'Delete';
+                        subDelBtn.addEventListener('click', () => {
+                            showConfirm('Delete this subtask?', yes => { if (yes) deleteTask(tasks.indexOf(sub)); });
+                        });
+                        subLi.appendChild(subSelect);
+                        subLi.appendChild(subCheck);
+                        subLi.appendChild(subSpan);
+                        subLi.appendChild(subDelBtn);
+                        taskList.appendChild(subLi);
+                    });
+                }
+            }
+        }
         // Due date
         if (task.dueDate) {
             const due = document.createElement('span');
