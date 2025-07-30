@@ -42,22 +42,49 @@ header {
 #theme-toggle:hover {
     background: #e3edff;
 }
-.input-section {
+#input-section, .input-section {
     display: flex;
+    flex-direction: row;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    align-items: stretch;
+    flex-wrap: wrap;
 }
-#task-input, #due-date-input {
-    flex: 1;
+.input-fields {
+    display: flex;
+    flex: 3 1 300px;
+    gap: 0.5rem;
+    align-items: center;
+    min-width: 0;
+}
+.input-fields input[type="text"],
+.input-fields input[type="date"],
+.input-fields select {
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1rem;
+    min-width: 0;
 }
-#due-date-input {
+.input-fields input[type="text"] {
+    flex: 2 1 120px;
+}
+.input-fields input[type="date"] {
+    flex: 1 1 80px;
     max-width: 140px;
 }
-#add-task-btn {
+.input-fields select {
+    flex: 1 1 80px;
+    min-width: 90px;
+}
+.input-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+#add-task-btn, #clear-inputs-btn {
     padding: 0.5rem 1rem;
     background: #4f8cff;
     color: #fff;
@@ -65,9 +92,32 @@ header {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
+    min-width: 80px;
+    margin: 0;
 }
-#add-task-btn:hover {
+#add-task-btn:hover, #clear-inputs-btn:hover {
     background: #357ae8;
+}
+#clear-inputs-btn {
+    background: #e74c3c;
+}
+#clear-inputs-btn:hover {
+    background: #c0392b;
+}
+
+@media (max-width: 600px) {
+    .input-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .input-fields, .input-buttons {
+        flex-direction: column;
+        width: 100%;
+        align-items: stretch;
+    }
+    .input-buttons {
+        margin-top: 0.5rem;
+    }
 }
 .bulk-actions {
     display: flex;
