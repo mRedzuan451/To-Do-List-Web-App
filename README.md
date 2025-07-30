@@ -7,47 +7,68 @@ A clean, intuitive, and responsive web application for managing daily tasks. Thi
 ![To-Do App Screenshot](link-to-your-app-screenshot.png) 
 ---
 
-## 🌟 Features (Core Functions)
 
-This application includes the following functionalities:
+## 🌟 Features (Core & Advanced)
 
-* **Add New Tasks:** A user can type a task into the input field and press `Enter` or click the "Add" button to add it to their list.
-* **Mark Tasks as Complete:** By clicking on a task or its checkbox, a user can toggle its completion status. Completed tasks are visually distinguished (e.g., with a strikethrough).
-* **Delete Tasks:** Each task has a "delete" button that, when clicked, removes the task from the list.
-* **Data Persistence:** Tasks are saved to the browser's **Local Storage**. This means your to-do list will still be there even if you close the browser tab or refresh the page.
-* **Filter Tasks:** Users can filter the view to see:
-    * **All** tasks.
-    * **Active** (incomplete) tasks only.
-    * **Completed** tasks only.
-* **Task Count:** A counter displays the number of active (incomplete) tasks remaining.
-* **Clear Completed:** A button to delete all completed tasks at once for easy list cleanup.
-* **Responsive Design:** The layout is fully responsive and works seamlessly on desktops, tablets, and mobile devices.
+This application now includes the following advanced functionalities:
+
+* **Add New Tasks:** Type a task and (optionally) set a due date, then press `Enter` or click "Add".
+* **Edit Tasks In-Place:** Double-click a task to edit its text directly.
+* **Mark Tasks as Complete:** Click a task's checkbox to toggle its completion status. Completed tasks are visually distinguished.
+* **Delete Tasks:** Each task has a delete button. Deletion is confirmed with a dialog.
+* **Bulk Actions:** Select multiple tasks to delete or mark as complete in one action.
+* **Drag-and-Drop Reordering:** Reorder tasks by dragging them up or down the list.
+* **Due Dates & Overdue Highlighting:** Tasks can have due dates. Overdue tasks are visually highlighted.
+* **Data Persistence:** Tasks are saved to the browser's **Local Storage** for persistence across sessions.
+* **Filter Tasks:** View **All**, **Active**, or **Completed** tasks with instant filtering.
+* **Task Count:** Displays the number of active (incomplete) tasks remaining.
+* **Clear Completed:** Remove all completed tasks at once (with confirmation).
+* **Progress Bar:** Visualize your completion rate with a progress bar.
+* **Export/Import:** Export your tasks to a file or import from a backup (JSON format).
+* **Dark Mode:** Toggle between light and dark themes.
+* **Accessibility:** Improved keyboard navigation, ARIA labels, and color contrast for better accessibility.
+* **Responsive Design:** Fully responsive layout for desktops, tablets, and mobile devices.
 
 ---
 
+
 ## 🌊 User Flow
 
-The user experience is designed to be simple and straightforward:
+The user experience is designed to be simple, powerful, and accessible:
 
-1.  **On Page Load:** The application checks for any existing tasks in Local Storage and renders them on the screen. If there are no saved tasks, the list appears empty.
-2.  **Adding a Task:** The user types a new to-do item into the main input field at the top. Upon hitting the `Enter` key or clicking the "Add" button, the task is instantly added to the bottom of the "Active" tasks list. The input field is then cleared.
-3.  **Completing a Task:** The user clicks on the task item. The app updates the task's status, applies a "completed" style to it, and updates the active task counter.
-4.  **Filtering the List:** The user can click on the "All," "Active," or "Completed" filter buttons at the bottom. The list of tasks will dynamically re-render to show only the relevant items without a page reload.
-5.  **Deleting a Task:** The user hovers over a task item, and a "delete" icon appears. Clicking this icon permanently removes the task from the list and from Local Storage.
-6.  **Closing the App:** The user can close the browser. Upon returning, all their previously saved tasks will be re-loaded exactly as they left them.
+1.  **On Page Load:** The app loads any saved tasks from Local Storage and applies your preferred theme.
+2.  **Adding a Task:** Enter a task (and optionally a due date), then press `Enter` or click "Add". The task appears in the list.
+3.  **Editing a Task:** Double-click a task to edit its text. Press `Enter` or click away to save.
+4.  **Completing a Task:** Click the checkbox to mark a task as complete/incomplete. The progress bar updates.
+5.  **Bulk Actions:** Select multiple tasks to delete or mark as complete using the bulk action buttons.
+6.  **Reordering:** Drag and drop tasks to reorder them.
+7.  **Filtering:** Instantly filter tasks by All, Active, or Completed.
+8.  **Deleting a Task:** Click the delete icon (with confirmation dialog) to remove a task.
+9.  **Clearing Completed:** Click "Clear Completed" to remove all completed tasks (with confirmation).
+10. **Export/Import:** Export your tasks to a file or import from a backup.
+11. **Theme Toggle:** Switch between light and dark mode at any time.
+12. **Accessibility:** Navigate and manage tasks using keyboard shortcuts and screen readers.
 
 ---
 
 ## 🛠️ Technologies & Tools Used
 
-This project was built using fundamental web technologies, demonstrating a strong grasp of the basics.
+This project is built using fundamental and modern web technologies:
 
 * **Core:**
-    * $HTML5$ (Semantic Markup)
-    * $CSS3$ (Custom Properties, Flexbox, Grid)
-    * $JavaScript (ES6+)$
+    * HTML5 (Semantic Markup)
+    * CSS3 (Custom Properties, Flexbox, Grid, Animations, Dark Mode)
+    * JavaScript (ES6+)
 * **APIs:**
-    * Web Storage API (`localStorage`) for client-side data persistence.
+    * Web Storage API (`localStorage`) for client-side data persistence
+    * File API for export/import
+* **Accessibility:**
+    * ARIA labels, keyboard navigation, and color contrast
+* **Development Tools:**
+    * Visual Studio Code
+    * Git & GitHub for version control
+* **Deployment:**
+    * Netlify for continuous integration and hosting
 * **Development Tools:**
     * Visual Studio Code
     * Git & GitHub for version control.
