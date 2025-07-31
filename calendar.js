@@ -36,15 +36,21 @@ function updateCalendarState(tasks, elementId) {
         const date = new Date(currentYear, currentMonth, i);
         const dateString = date.toISOString().split('T')[0];
         const hasDueDate = tasks.some(task => task.dueDate === dateString && !task.completed);
+        const isToday = i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
         
         let classes = "p-1.5 rounded-full cursor-pointer transition-colors duration-200";
+
         if (hasDueDate) {
             classes += " bg-blue-500 text-white hover:bg-blue-600";
+        } else if (isToday) {
+            // A special style for today's date if it's not a due date
+            classes += " bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold";
         } else {
             classes += " hover:bg-gray-200 dark:hover:bg-gray-700";
         }
 
-        if (i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+        if (isToday) {
+            // Always add a ring to today's date to make it stand out
             classes += " ring-2 ring-blue-500";
         }
         
