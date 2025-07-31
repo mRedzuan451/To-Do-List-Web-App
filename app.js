@@ -1,6 +1,7 @@
 import { loadTasks } from './storage.js';
 import { renderTasks, getTaskInput, clearInputs, getFilter, getConfirm } from './ui.js';
 import * as TaskManager from './tasks.js';
+import { renderCalendar } from './calendar.js';
 
 let tasks = loadTasks();
 let filter = 'all';
@@ -8,14 +9,10 @@ let selectedTasks = new Set();
 let draggedTaskId = null;
 
 function App() {
-    // Initial Render
     renderApp();
 
     const taskList = document.getElementById('task-list');
 
-    // --- Event Listeners ---
-
-    // Add Task
     document.getElementById('add-task-btn').addEventListener('click', () => {
         const input = getTaskInput();
         if (input.text) {
@@ -25,14 +22,10 @@ function App() {
         }
     });
 
-    // Clear Inputs
     document.getElementById('clear-inputs-btn').addEventListener('click', () => {
         clearInputs();
     });
 
-    // --- Task List Actions (Event Delegation) ---
-
-    // Click handler for checkboxes and delete buttons
     taskList.addEventListener('click', (e) => {
         const taskItem = e.target.closest('.task-item');
         if (!taskItem) return;
@@ -58,7 +51,6 @@ function App() {
         }
     });
 
-    // Double-click handler for in-place editing
     taskList.addEventListener('dblclick', (e) => {
         if (e.target.matches('.task-text')) {
             const taskTextSpan = e.target;
@@ -68,7 +60,7 @@ function App() {
 
             taskTextSpan.contentEditable = true;
             taskTextSpan.focus();
-            taskItem.draggable = false; // Disable drag while editing
+            taskItem.draggable = false;
 
             const saveChanges = () => {
                 taskTextSpan.contentEditable = false;
@@ -78,9 +70,9 @@ function App() {
                 if (newText && newText !== originalText) {
                     tasks = TaskManager.editTask(tasks, taskId, newText);
                 } else {
-                    taskTextSpan.textContent = originalText; // Revert if empty or unchanged
+                    taskTextSpan.textContent = originalText;
                 }
-                renderApp(); // Re-render to clean up styles and state
+                renderApp();
             };
             
             taskTextSpan.addEventListener('blur', saveChanges);
@@ -92,11 +84,10 @@ function App() {
                     taskTextSpan.textContent = originalText;
                     taskTextSpan.blur();
                 }
-            }, { once: true }); // Use once to avoid multiple listeners
+            }, { once: true });
         }
     });
 
-    // --- Drag and Drop Handlers ---
     taskList.addEventListener('dragstart', (e) => {
         if (e.target.matches('.task-item')) {
             draggedTaskId = e.target.dataset.id;
@@ -106,10 +97,6 @@ function App() {
 
     taskList.addEventListener('dragover', (e) => {
         e.preventDefault();
-        const taskItem = e.target.closest('.task-item');
-        if (taskItem && taskItem.dataset.id !== draggedTaskId) {
-            // Can add visual indicators here
-        }
     });
 
     taskList.addEventListener('drop', (e) => {
@@ -129,8 +116,6 @@ function App() {
         draggedTaskId = null;
     });
 
-
-    // --- Other Listeners ---
     document.querySelector('.filters').addEventListener('click', (e) => {
         if (e.target.matches('.filter-btn')) {
             filter = getFilter(e.target);
@@ -188,7 +173,7 @@ function App() {
 function renderApp() {
     const filteredTasks = TaskManager.getFilteredTasks(tasks, filter);
     renderTasks(filteredTasks, selectedTasks);
+    renderCalendar(tasks);
 }
 
-// Start the app
 App();
