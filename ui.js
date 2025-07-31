@@ -74,10 +74,8 @@ export function getFilter(filterButton) {
 export function getConfirm(message, callback) {
     const dialog = document.getElementById('confirm-dialog');
     const messageEl = document.getElementById('confirm-message');
-    const yesBtn = document.getElementById('confirm-yes');
-    const noBtn = document.getElementById('confirm-no');
 
-    if (!dialog || !messageEl || !yesBtn || !noBtn) {
+    if (!dialog || !messageEl) {
         console.error('Confirmation dialog elements not found.');
         return;
     }
@@ -85,16 +83,21 @@ export function getConfirm(message, callback) {
     messageEl.textContent = message;
     dialog.classList.remove('hidden');
 
-    // This creates a new, clean function for the "Yes" click
-    // It replaces any old listener that might be stuck
-    yesBtn.onclick = () => {
-        dialog.classList.add('hidden');
-        callback(true);
+    const handleClick = (e) => {
+        let decision = null;
+
+        if (e.target.id === 'confirm-yes') {
+            decision = true;
+        } else if (e.target.id === 'confirm-no') {
+            decision = false;
+        }
+
+        if (decision !== null) {
+            dialog.classList.add('hidden');
+            dialog.removeEventListener('click', handleClick); // Clean up the listener
+            callback(decision);
+        }
     };
 
-    // Same for the "No" click
-    noBtn.onclick = () => {
-        dialog.classList.add('hidden');
-        callback(false);
-    };
+    dialog.addEventListener('click', handleClick);
 }
