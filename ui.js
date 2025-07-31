@@ -71,8 +71,7 @@ export function getFilter(filterButton) {
 }
 
 export function getConfirm(message, callback) {
-    // *** DEBUGGING LOG ***
-    console.log('[ui.js] getConfirm function called.');
+    console.log("DEBUG: `getConfirm` function has been called.");
 
     const dialog = document.getElementById('confirm-dialog');
     const messageEl = document.getElementById('confirm-message');
@@ -80,39 +79,29 @@ export function getConfirm(message, callback) {
     const noBtn = document.getElementById('confirm-no');
 
     if (!dialog || !messageEl || !yesBtn || !noBtn) {
-        console.error('[ui.js] ERROR: Confirmation dialog elements not found in the DOM.');
+        console.error("DEBUG: ERROR! One or more confirmation dialog elements could not be found in the HTML.");
         return;
     }
 
     messageEl.textContent = message;
     dialog.classList.remove('hidden');
-    // *** DEBUGGING LOG ***
-    console.log('[ui.js] Confirmation dialog is now visible.');
+    console.log("DEBUG: The confirmation dialog is now visible.");
 
-    const handleClick = (e) => {
-        // *** DEBUGGING LOG ***
-        console.log(`[ui.js] Click detected inside dialog. Target ID: ${e.target.id}`);
-        
-        let decision = null;
+    const controller = new AbortController();
 
-        if (e.target.id === 'confirm-yes') {
-            decision = true;
-        } else if (e.target.id === 'confirm-no') {
-            decision = false;
-        }
+    yesBtn.addEventListener('click', () => {
+        console.log("DEBUG: 'Yes' button was clicked.");
+        dialog.classList.add('hidden');
+        callback(true);
+        controller.abort(); // Clean up all listeners
+    }, { signal: controller.signal });
 
-        if (decision !== null) {
-            // *** DEBUGGING LOG ***
-            console.log(`[ui.js] Decision made: ${decision}. Hiding dialog and cleaning up listener.`);
-            dialog.classList.add('hidden');
-            dialog.removeEventListener('click', handleClick); // Clean up to prevent multiple triggers
-            callback(decision);
-        }
-    };
+    noBtn.addEventListener('click', () => {
+        console.log("DEBUG: 'No' button was clicked.");
+        dialog.classList.add('hidden');
+        callback(false);
+        controller.abort(); // Clean up all listeners
+    }, { signal: controller.signal });
 
-    // Remove any old listeners before adding a new one to be safe
-    dialog.removeEventListener('click', handleClick);
-    dialog.addEventListener('click', handleClick);
-    // *** DEBUGGING LOG ***
-    console.log('[ui.js] Click listener attached to the dialog.');
+    console.log("DEBUG: Event listeners have been attached to the 'Yes' and 'No' buttons.");
 }
