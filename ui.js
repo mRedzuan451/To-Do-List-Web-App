@@ -2,12 +2,11 @@ export function renderTasks(tasks, selectedTasks) {
     const taskList = document.getElementById('task-list');
     const currentlyEditing = document.querySelector('.task-text[contenteditable="true"]');
     
-    // If we are editing, don't re-render the whole list to avoid losing focus
     if (currentlyEditing) {
         return;
     }
 
-    taskList.innerHTML = ''; // Clear the list before re-rendering
+    taskList.innerHTML = ''; 
 
     if (tasks.length === 0) {
         taskList.innerHTML = '<p class="empty-message text-center text-gray-500 py-4">No tasks to show.</p>';
@@ -35,8 +34,6 @@ export function renderTasks(tasks, selectedTasks) {
 
         taskList.appendChild(taskItem);
     });
-
-    // Update other UI elements like task count, progress bar etc.
 }
 
 export function getTaskInput() {
@@ -45,7 +42,10 @@ export function getTaskInput() {
     const priority = document.getElementById('priority-input').value;
     const description = document.getElementById('desc-input').value.trim();
     const link = document.getElementById('link-input').value.trim();
-    const attachments = Array.from(document.getElementById('attach-input').files).map(f => f.name);
+    
+    // Safely get attachments only if the input exists
+    const attachInput = document.getElementById('attach-input');
+    const attachments = attachInput ? Array.from(attachInput.files).map(f => f.name) : [];
 
     return { text, dueDate, priority, description, link, attachments };
 }
@@ -56,7 +56,12 @@ export function clearInputs() {
     document.getElementById('priority-input').value = 'none';
     document.getElementById('desc-input').value = '';
     document.getElementById('link-input').value = '';
-    document.getElementById('attach-input').value = '';
+    
+    const attachInput = document.getElementById('attach-input');
+    if (attachInput) {
+        attachInput.value = '';
+    }
+    
     document.getElementById('task-input').focus();
 }
 
@@ -71,6 +76,11 @@ export function getConfirm(message, callback) {
     const messageEl = document.getElementById('confirm-message');
     const yesBtn = document.getElementById('confirm-yes');
     const noBtn = document.getElementById('confirm-no');
+
+    if (!dialog || !messageEl || !yesBtn || !noBtn) {
+        console.error('Confirmation dialog elements not found.');
+        return;
+    }
 
     messageEl.textContent = message;
     dialog.classList.remove('hidden');
