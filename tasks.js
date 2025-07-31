@@ -17,9 +17,8 @@ export function addTask(tasks, taskData) {
 }
 
 export function deleteTask(tasks, id) {
-    console.log('Before delete:', tasks); // <-- Add this line
-    const newTasks = tasks.filter(task => task.id !== id);
-    console.log('After delete:', newTasks); // <-- And this one
+    // Use != instead of !== to allow for type coercion between number and string
+    const newTasks = tasks.filter(task => task.id != id); // <-- Change is here
     saveTasks(newTasks);
     return newTasks;
 }
