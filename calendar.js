@@ -1,15 +1,16 @@
-// calendar.js
-
 function renderCalendar(tasks = []) {
     const calendarEl = document.getElementById('calendar');
-    const now = new Date();
-    let currentMonth = now.getMonth();
-    let currentYear = now.getFullYear();
+    if (!calendarEl) return; // Guard clause in case the element isn't there
 
-    function updateCalendar() {
+    let currentMonth, currentYear;
+
+    function updateCalendar(month, year) {
+        currentMonth = month;
+        currentYear = year;
+
         calendarEl.innerHTML = '';
         const firstDay = new Date(currentYear, currentMonth, 1);
-        const lastDay = new BDate(currentYear, currentMonth + 1, 0);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0); // Corrected typo here
 
         const header = document.createElement('div');
         header.className = 'flex justify-between items-center mb-4';
@@ -32,39 +33,50 @@ function renderCalendar(tasks = []) {
             daysGrid.innerHTML += '<div></div>';
         }
 
+        const today = new Date();
         for (let i = 1; i <= lastDay.getDate(); i++) {
             const date = new Date(currentYear, currentMonth, i);
             const dateString = date.toISOString().split('T')[0];
-            const hasDueDate = tasks.some(task => task.dueDate === dateString);
+            const hasDueDate = tasks.some(task => task.dueDate === dateString && !task.completed);
             
-            daysGrid.innerHTML += `
-                <div class="p-1 rounded-full ${hasDueDate ? 'bg-blue-500 text-white' : ''} ${i === now.getDate() && currentMonth === now.getMonth() && currentYear === now.getFullYear() ? 'ring-2 ring-blue-500' : ''}">
-                    ${i}
-                </div>
-            `;
+            let classes = "p-1 rounded-full";
+            if (hasDueDate) {
+                classes += " bg-blue-500 text-white";
+            }
+            if (i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+                classes += " ring-2 ring-blue-500";
+            }
+            
+            daysGrid.innerHTML += `<div class="${classes}">${i}</div>`;
         }
         calendarEl.appendChild(daysGrid);
 
         document.getElementById('prev-month').addEventListener('click', () => {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
+            let newMonth = currentMonth - 1;
+            let newYear = currentYear;
+            if (newMonth < 0) {
+                newMonth = 11;
+                newYear--;
             }
-            updateCalendar();
+            updateCalendar(newMonth, newYear);
         });
 
         document.getElementById('next-month').addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
+            let newMonth = currentMonth + 1;
+            let newYear = currentYear;
+            if (newMonth > 11) {
+                newMonth = 0;
+                newYear++;
             }
-            updateCalendar();
+            updateCalendar(newMonth, newYear);
         });
     }
 
-    updateCalendar();
+    // Initialize calendar with current month and year
+    if (calendarEl.innerHTML === '') {
+        const now = new Date();
+        updateCalendar(now.getMonth(), now.getFullYear());
+    }
 }
 
 export { renderCalendar };
