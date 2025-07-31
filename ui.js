@@ -70,38 +70,31 @@ export function getFilter(filterButton) {
     return filterButton.dataset.filter;
 }
 
-export function getConfirm(message, callback) {
-    console.log("DEBUG: `getConfirm` function has been called.");
+// *** NEW PROMISE-BASED CONFIRMATION FUNCTION ***
+export function getConfirm(message) {
+    return new Promise(resolve => {
+        const dialog = document.getElementById('confirm-dialog');
+        const messageEl = document.getElementById('confirm-message');
+        const yesBtn = document.getElementById('confirm-yes');
+        const noBtn = document.getElementById('confirm-no');
 
-    const dialog = document.getElementById('confirm-dialog');
-    const messageEl = document.getElementById('confirm-message');
-    const yesBtn = document.getElementById('confirm-yes');
-    const noBtn = document.getElementById('confirm-no');
+        if (!dialog || !messageEl || !yesBtn || !noBtn) {
+            console.error('Confirmation dialog elements not found.');
+            resolve(false); // Resolve with false if the dialog is broken
+            return;
+        }
 
-    if (!dialog || !messageEl || !yesBtn || !noBtn) {
-        console.error("DEBUG: ERROR! One or more confirmation dialog elements could not be found in the HTML.");
-        return;
-    }
+        messageEl.textContent = message;
+        dialog.classList.remove('hidden');
 
-    messageEl.textContent = message;
-    dialog.classList.remove('hidden');
-    console.log("DEBUG: The confirmation dialog is now visible.");
+        const controller = new AbortController();
 
-    const controller = new AbortController();
+        yesBtn.addEventListener('click', () => resolve(true), { signal: controller.signal });
+        noBtn.addEventListener('click', () => resolve(false), { signal: controller.signal });
 
-    yesBtn.addEventListener('click', () => {
-        console.log("DEBUG: 'Yes' button was clicked.");
-        dialog.classList.add('hidden');
-        callback(true);
-        controller.abort(); // Clean up all listeners
-    }, { signal: controller.signal });
-
-    noBtn.addEventListener('click', () => {
-        console.log("DEBUG: 'No' button was clicked.");
-        dialog.classList.add('hidden');
-        callback(false);
-        controller.abort(); // Clean up all listeners
-    }, { signal: controller.signal });
-
-    console.log("DEBUG: Event listeners have been attached to the 'Yes' and 'No' buttons.");
+    }).finally(() => {
+        // This code runs after the promise is resolved (user clicks Yes or No)
+        const dialog = document.getElementById('confirm-dialog');
+        if (dialog) dialog.classList.add('hidden');
+    });
 }

@@ -1,7 +1,6 @@
 import { loadTasks } from './storage.js';
 import { renderTasks, getTaskInput, clearInputs, getFilter, getConfirm } from './ui.js';
 import * as TaskManager from './tasks.js';
-// This line is required to make the calendar function available
 import { renderCalendar } from './calendar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,16 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeCalendarBtn = document.getElementById('close-calendar-btn');
         const calendarModal = document.getElementById('calendar-modal');
 
-        // Event Listeners for Calendar Modal
         if(openCalendarBtn && closeCalendarBtn && calendarModal) {
             openCalendarBtn.addEventListener('click', () => {
                 calendarModal.classList.remove('hidden');
             });
-
             closeCalendarBtn.addEventListener('click', () => {
                 calendarModal.classList.add('hidden');
             });
-
             calendarModal.addEventListener('click', (e) => {
                 if (e.target === calendarModal) {
                     calendarModal.classList.add('hidden');
@@ -35,33 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-
-        // Other App Event Listeners
-        document.getElementById('add-task-btn').addEventListener('click', () => {
-            const input = getTaskInput();
-            if (input.text) {
-                tasks = TaskManager.addTask(tasks, input);
-                clearInputs();
-                renderApp();
-            }
-        });
-
-        document.getElementById('clear-inputs-btn').addEventListener('click', () => {
-            clearInputs();
-        });
-
-        taskList.addEventListener('click', (e) => {
+        // Make the main click handler async to use await
+        taskList.addEventListener('click', async (e) => {
             const taskItem = e.target.closest('.task-item');
             if (!taskItem) return;
             const taskId = taskItem.dataset.id;
 
             if (e.target.matches('.delete-btn')) {
-                getConfirm('Are you sure you want to delete this task?', (confirmed) => {
-                    if (confirmed) {
-                        tasks = TaskManager.deleteTask(tasks, taskId);
-                        renderApp();
-                    }
-                });
+                const confirmed = await getConfirm('Are you sure you want to delete this task?');
+                if (confirmed) {
+                    tasks = TaskManager.deleteTask(tasks, taskId);
+                    renderApp();
+                }
             } else if (e.target.matches('.task-checkbox')) {
                 tasks = TaskManager.toggleTask(tasks, taskId);
                 renderApp();
@@ -73,6 +54,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 renderApp();
             }
+        });
+
+        document.getElementById('add-task-btn').addEventListener('click', () => {
+            const input = getTaskInput();
+            if (input.text) {
+                tasks = TaskManager.addTask(tasks, input);
+                clearInputs();
+                renderApp();
+            }
+        });
+
+        document.getElementById('clear-inputs-btn').addEventListener('click', () => {
+            clearInputs();
         });
 
         taskList.addEventListener('dblclick', (e) => {
@@ -157,15 +151,14 @@ document.addEventListener('DOMContentLoaded', () => {
             renderApp();
         });
 
-        document.getElementById('delete-selected-btn').addEventListener('click', () => {
+        document.getElementById('delete-selected-btn').addEventListener('click', async () => {
             if (selectedTasks.size === 0) return;
-            getConfirm('Delete selected tasks?', (confirmed) => {
-                if (confirmed) {
-                    tasks = TaskManager.deleteMultipleTasks(tasks, selectedTasks);
-                    selectedTasks.clear();
-                    renderApp();
-                }
-            });
+            const confirmed = await getConfirm('Delete selected tasks?');
+            if(confirmed) {
+                tasks = TaskManager.deleteMultipleTasks(tasks, selectedTasks);
+                selectedTasks.clear();
+                renderApp();
+            }
         });
 
         document.getElementById('complete-selected-btn').addEventListener('click', () => {
@@ -175,13 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
             renderApp();
         });
 
-        document.getElementById('clear-completed').addEventListener('click', () => {
-            getConfirm('Clear all completed tasks?', (confirmed) => {
-                if (confirmed) {
-                    tasks = TaskManager.clearCompletedTasks(tasks);
-                    renderApp();
-                }
-            });
+        document.getElementById('clear-completed').addEventListener('click', async () => {
+            const confirmed = await getConfirm('Clear all completed tasks?');
+            if (confirmed) {
+                tasks = TaskManager.clearCompletedTasks(tasks);
+                renderApp();
+            }
         });
 
         document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -201,6 +193,5 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCalendar(tasks, 'mobile-calendar');
     }
 
-    // Start the app
     App();
 });
