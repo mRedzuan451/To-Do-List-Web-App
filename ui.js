@@ -43,7 +43,6 @@ export function getTaskInput() {
     const description = document.getElementById('desc-input').value.trim();
     const link = document.getElementById('link-input').value.trim();
     
-    // Safely get attachments only if the input exists
     const attachInput = document.getElementById('attach-input');
     const attachments = attachInput ? Array.from(attachInput.files).map(f => f.name) : [];
 
@@ -94,13 +93,13 @@ export function getConfirm(message, callback) {
         callback(false);
         cleanup();
     };
-    
-    yesBtn.onclick = handleYes;
-    noBtn.onclick = handleNo;
+
+    // Use addEventListener for more reliable click handling
+    yesBtn.addEventListener('click', handleYes, { once: true });
+    noBtn.addEventListener('click', handleNo, { once: true });
 
     function cleanup() {
         dialog.classList.add('hidden');
-        yesBtn.onclick = null;
-        noBtn.onclick = null;
+        // No need to remove listeners when using the { once: true } option
     }
 }
