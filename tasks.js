@@ -33,6 +33,30 @@ export function toggleTask(tasks, id) {
     return newTasks;
 }
 
+export function editTask(tasks, id, newText) {
+    const newTasks = tasks.map(task => {
+        if (task.id === id) {
+            return { ...task, text: newText };
+        }
+        return task;
+    });
+    saveTasks(newTasks);
+    return newTasks;
+}
+
+export function reorderTask(tasks, fromId, toId) {
+    const fromIndex = tasks.findIndex(task => task.id === fromId);
+    const toIndex = tasks.findIndex(task => task.id === toId);
+
+    const newTasks = [...tasks];
+    const [movedTask] = newTasks.splice(fromIndex, 1);
+    newTasks.splice(toIndex, 0, movedTask);
+    
+    saveTasks(newTasks);
+    return newTasks;
+}
+
+
 export function clearCompletedTasks(tasks) {
     const newTasks = tasks.filter(task => !task.completed);
     saveTasks(newTasks);
