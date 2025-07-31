@@ -17,7 +17,9 @@ export function addTask(tasks, taskData) {
 }
 
 export function deleteTask(tasks, id) {
+    console.log('Before delete:', tasks); // <-- Add this line
     const newTasks = tasks.filter(task => task.id !== id);
+    console.log('After delete:', newTasks); // <-- And this one
     saveTasks(newTasks);
     return newTasks;
 }

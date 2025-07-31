@@ -32,13 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         taskList.addEventListener('click', (e) => {
+            console.log('Task list clicked!'); // <-- Add this line
             const taskItem = e.target.closest('.task-item');
             if (!taskItem) return;
             const taskId = taskItem.dataset.id;
 
             if (e.target.matches('.delete-btn')) {
-                // Store the delete action, then show the dialog
+                console.log('Delete button clicked for task ID:', taskId);                // Store the delete action, then show the dialog
                 actionToConfirm = () => {
+                    console.log('Confirmation received, deleting task:', taskId);
                     tasks = TaskManager.deleteTask(tasks, taskId);
                     renderApp();
                 };
