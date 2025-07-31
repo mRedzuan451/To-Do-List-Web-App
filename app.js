@@ -95,7 +95,7 @@ function addTask() {
     if (descInput) descInput.value = '';
     if (linkInput) linkInput.value = '';
     if (attachInput) attachInput.value = '';
-}
+
     taskList.innerHTML = '';
     let filtered = tasks;
     if (mainTaskId) {
