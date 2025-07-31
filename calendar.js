@@ -33,8 +33,12 @@ function updateCalendarState(tasks, elementId) {
 
     const today = new Date();
     for (let i = 1; i <= lastDay.getDate(); i++) {
-        const date = new Date(currentYear, currentMonth, i);
-        const dateString = date.toISOString().split('T')[0];
+        // --- FIX: Manually build the date string to avoid timezone issues ---
+        const monthString = String(currentMonth + 1).padStart(2, '0');
+        const dayString = String(i).padStart(2, '0');
+        const dateString = `${currentYear}-${monthString}-${dayString}`;
+        // --- End of Fix ---
+
         const hasDueDate = tasks.some(task => task.dueDate === dateString && !task.completed);
         const isToday = i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
         
@@ -43,14 +47,12 @@ function updateCalendarState(tasks, elementId) {
         if (hasDueDate) {
             classes += " bg-blue-500 text-white hover:bg-blue-600";
         } else if (isToday) {
-            // A special style for today's date if it's not a due date
             classes += " bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold";
         } else {
             classes += " hover:bg-gray-200 dark:hover:bg-gray-700";
         }
 
         if (isToday) {
-            // Always add a ring to today's date to make it stand out
             classes += " ring-2 ring-blue-500";
         }
         
@@ -58,7 +60,6 @@ function updateCalendarState(tasks, elementId) {
     }
     calendarEl.appendChild(daysGrid);
 
-    // Re-add event listeners for the new buttons
     calendarEl.querySelector('.prev-month-btn').addEventListener('click', () => {
         currentMonth--;
         if (currentMonth < 0) {
