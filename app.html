@@ -15,14 +15,19 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <div class="flex h-screen">
-        <aside class="w-1/4 p-4 bg-white dark:bg-gray-800 shadow-lg overflow-y-auto">
-            <div id="calendar" class="text-sm"></div>
+        <aside class="hidden md:block w-1/4 p-4 bg-white dark:bg-gray-800 shadow-lg overflow-y-auto">
+            <div id="desktop-calendar" class="text-sm"></div>
         </aside>
 
-        <main class="w-3/4 p-6 overflow-y-auto">
+        <main class="w-full md:w-3/4 p-6 overflow-y-auto">
             <div class="todo-app max-w-2xl mx-auto" role="main">
                 <header class="flex items-center justify-between mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800 dark:text-white">To-Do List</h1>
+                    <div class="flex items-center gap-4">
+                        <button id="open-calendar-btn" class="md:hidden p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i class="fas fa-calendar-alt"></i>
+                        </button>
+                        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">To-Do List</h1>
+                    </div>
                     <button id="theme-toggle" aria-label="Toggle dark mode" class="text-2xl p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">🌙</button>
                 </header>
 
@@ -76,20 +81,24 @@
                         <button id="import-tasks-btn" class="px-3 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">Import</button>
                     </div>
                 </div>
-        
-                <div id="confirm-dialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
-                    <div class="modal-content bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-                        <h2 id="confirm-title" class="text-lg font-semibold mb-2">Are you sure?</h2>
-                        <p id="confirm-message" class="mb-4"></p>
-                        <div class="flex justify-center gap-4">
-                            <button id="confirm-yes" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Yes</button>
-                            <button id="confirm-no" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500">No</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </main>
     </div>
+
+    <div id="calendar-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-11/12 max-w-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Calendar</h2>
+                <button id="close-calendar-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="mobile-calendar"></div>
+        </div>
+    </div>
+    
+    <div id="confirm-dialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      </div>
 
     <script type="module" src="app.js"></script>
 </body>

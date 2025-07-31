@@ -1,11 +1,10 @@
 let currentMonth;
 let currentYear;
 
-function updateCalendarState(tasks) {
-    const calendarEl = document.getElementById('calendar');
+function updateCalendarState(tasks, elementId) {
+    const calendarEl = document.getElementById(elementId);
     if (!calendarEl) return;
 
-    // Clear previous calendar content
     calendarEl.innerHTML = '';
 
     const firstDay = new Date(currentYear, currentMonth, 1);
@@ -14,9 +13,9 @@ function updateCalendarState(tasks) {
     const header = document.createElement('div');
     header.className = 'flex justify-between items-center mb-4';
     header.innerHTML = `
-        <button id="prev-month" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"><i class="fas fa-chevron-left"></i></button>
+        <button data-calendar-id="${elementId}" class="prev-month-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"><i class="fas fa-chevron-left"></i></button>
         <h3 class="font-bold text-lg">${firstDay.toLocaleString('default', { month: 'long' })} ${currentYear}</h3>
-        <button id="next-month" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"><i class="fas fa-chevron-right"></i></button>
+        <button data-calendar-id="${elementId}" class="next-month-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"><i class="fas fa-chevron-right"></i></button>
     `;
     calendarEl.appendChild(header);
 
@@ -53,33 +52,33 @@ function updateCalendarState(tasks) {
     }
     calendarEl.appendChild(daysGrid);
 
-    document.getElementById('prev-month').addEventListener('click', () => {
+    // Re-add event listeners for the new buttons
+    calendarEl.querySelector('.prev-month-btn').addEventListener('click', () => {
         currentMonth--;
         if (currentMonth < 0) {
             currentMonth = 11;
             currentYear--;
         }
-        updateCalendarState(tasks);
+        updateCalendarState(tasks, elementId);
     });
 
-    document.getElementById('next-month').addEventListener('click', () => {
+    calendarEl.querySelector('.next-month-btn').addEventListener('click', () => {
         currentMonth++;
         if (currentMonth > 11) {
             currentMonth = 0;
             currentYear++;
         }
-        updateCalendarState(tasks);
+        updateCalendarState(tasks, elementId);
     });
 }
 
-function renderCalendar(tasks = []) {
-    // Initialize month and year on the first run
+function renderCalendar(tasks = [], elementId) {
     if (currentMonth === undefined || currentYear === undefined) {
         const now = new Date();
         currentMonth = now.getMonth();
         currentYear = now.getFullYear();
     }
-    updateCalendarState(tasks);
+    updateCalendarState(tasks, elementId);
 }
 
 export { renderCalendar };

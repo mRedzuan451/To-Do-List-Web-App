@@ -3,7 +3,6 @@ import { renderTasks, getTaskInput, clearInputs, getFilter, getConfirm } from '.
 import * as TaskManager from './tasks.js';
 import { renderCalendar } from './calendar.js';
 
-// Wait for the DOM to be fully loaded before running the app
 document.addEventListener('DOMContentLoaded', () => {
     let tasks = loadTasks();
     let filter = 'all';
@@ -14,7 +13,28 @@ document.addEventListener('DOMContentLoaded', () => {
         renderApp();
 
         const taskList = document.getElementById('task-list');
+        const openCalendarBtn = document.getElementById('open-calendar-btn');
+        const closeCalendarBtn = document.getElementById('close-calendar-btn');
+        const calendarModal = document.getElementById('calendar-modal');
 
+        // --- Event Listeners for Calendar Modal ---
+        openCalendarBtn.addEventListener('click', () => {
+            calendarModal.classList.remove('hidden');
+        });
+
+        closeCalendarBtn.addEventListener('click', () => {
+            calendarModal.classList.add('hidden');
+        });
+
+        // Click outside the modal to close it
+        calendarModal.addEventListener('click', (e) => {
+            if (e.target === calendarModal) {
+                calendarModal.classList.add('hidden');
+            }
+        });
+
+
+        // --- Other App Event Listeners ---
         document.getElementById('add-task-btn').addEventListener('click', () => {
             const input = getTaskInput();
             if (input.text) {
@@ -175,7 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderApp() {
         const filteredTasks = TaskManager.getFilteredTasks(tasks, filter);
         renderTasks(filteredTasks, selectedTasks);
-        renderCalendar(tasks);
+        // Render the calendar in both places
+        renderCalendar(tasks, 'desktop-calendar');
+        renderCalendar(tasks, 'mobile-calendar');
     }
 
     // Start the app
