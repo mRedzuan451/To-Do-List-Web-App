@@ -70,20 +70,29 @@ export function getFilter(filterButton) {
     return filterButton.dataset.filter;
 }
 
-// *** NEW, MORE RELIABLE CONFIRMATION FUNCTION ***
 export function getConfirm(message, callback) {
+    // *** DEBUGGING LOG ***
+    console.log('[ui.js] getConfirm function called.');
+
     const dialog = document.getElementById('confirm-dialog');
     const messageEl = document.getElementById('confirm-message');
+    const yesBtn = document.getElementById('confirm-yes');
+    const noBtn = document.getElementById('confirm-no');
 
-    if (!dialog || !messageEl) {
-        console.error('Confirmation dialog elements not found.');
+    if (!dialog || !messageEl || !yesBtn || !noBtn) {
+        console.error('[ui.js] ERROR: Confirmation dialog elements not found in the DOM.');
         return;
     }
 
     messageEl.textContent = message;
     dialog.classList.remove('hidden');
+    // *** DEBUGGING LOG ***
+    console.log('[ui.js] Confirmation dialog is now visible.');
 
     const handleClick = (e) => {
+        // *** DEBUGGING LOG ***
+        console.log(`[ui.js] Click detected inside dialog. Target ID: ${e.target.id}`);
+        
         let decision = null;
 
         if (e.target.id === 'confirm-yes') {
@@ -93,11 +102,17 @@ export function getConfirm(message, callback) {
         }
 
         if (decision !== null) {
+            // *** DEBUGGING LOG ***
+            console.log(`[ui.js] Decision made: ${decision}. Hiding dialog and cleaning up listener.`);
             dialog.classList.add('hidden');
-            dialog.removeEventListener('click', handleClick); // Clean up the listener
+            dialog.removeEventListener('click', handleClick); // Clean up to prevent multiple triggers
             callback(decision);
         }
     };
 
+    // Remove any old listeners before adding a new one to be safe
+    dialog.removeEventListener('click', handleClick);
     dialog.addEventListener('click', handleClick);
+    // *** DEBUGGING LOG ***
+    console.log('[ui.js] Click listener attached to the dialog.');
 }

@@ -1,7 +1,6 @@
 import { loadTasks } from './storage.js';
 import { renderTasks, getTaskInput, clearInputs, getFilter, getConfirm } from './ui.js';
 import * as TaskManager from './tasks.js';
-import { renderCalendar } from './calendar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     let tasks = loadTasks();
@@ -10,31 +9,42 @@ document.addEventListener('DOMContentLoaded', () => {
     let draggedTaskId = null;
 
     function App() {
+        console.log('App Initialized');
         renderApp();
 
         const taskList = document.getElementById('task-list');
-        const openCalendarBtn = document.getElementById('open-calendar-btn');
-        const closeCalendarBtn = document.getElementById('close-calendar-btn');
-        const calendarModal = document.getElementById('calendar-modal');
+        // ... (other event listeners remain the same)
 
-        // --- Event Listeners for Calendar Modal ---
-        openCalendarBtn.addEventListener('click', () => {
-            calendarModal.classList.remove('hidden');
-        });
+        taskList.addEventListener('click', (e) => {
+            const taskItem = e.target.closest('.task-item');
+            if (!taskItem) return;
+            const taskId = taskItem.dataset.id;
 
-        closeCalendarBtn.addEventListener('click', () => {
-            calendarModal.classList.add('hidden');
-        });
-
-        // Click outside the modal to close it
-        calendarModal.addEventListener('click', (e) => {
-            if (e.target === calendarModal) {
-                calendarModal.classList.add('hidden');
+            if (e.target.matches('.delete-btn')) {
+                // *** DEBUGGING LOG ***
+                console.log(`[app.js] Delete button clicked for task ID: ${taskId}. Calling getConfirm...`);
+                getConfirm('Are you sure you want to delete this task?', (confirmed) => {
+                    // *** DEBUGGING LOG ***
+                    console.log(`[app.js] getConfirm callback executed. Decision: ${confirmed}`);
+                    if (confirmed) {
+                        tasks = TaskManager.deleteTask(tasks, taskId);
+                        renderApp();
+                    }
+                });
+            } else if (e.target.matches('.task-checkbox')) {
+                tasks = TaskManager.toggleTask(tasks, taskId);
+                renderApp();
+            } else if (e.target.matches('.select-checkbox')) {
+                if (e.target.checked) {
+                    selectedTasks.add(taskId);
+                } else {
+                    selectedTasks.delete(taskId);
+                }
+                renderApp();
             }
         });
 
-
-        // --- Other App Event Listeners ---
+        // ... (rest of the functions in app.js remain the same)
         document.getElementById('add-task-btn').addEventListener('click', () => {
             const input = getTaskInput();
             if (input.text) {
@@ -46,31 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('clear-inputs-btn').addEventListener('click', () => {
             clearInputs();
-        });
-
-        taskList.addEventListener('click', (e) => {
-            const taskItem = e.target.closest('.task-item');
-            if (!taskItem) return;
-            const taskId = taskItem.dataset.id;
-
-            if (e.target.matches('.task-checkbox')) {
-                tasks = TaskManager.toggleTask(tasks, taskId);
-                renderApp();
-            } else if (e.target.matches('.delete-btn')) {
-                getConfirm('Are you sure you want to delete this task?', (confirmed) => {
-                    if (confirmed) {
-                        tasks = TaskManager.deleteTask(tasks, taskId);
-                        renderApp();
-                    }
-                });
-            } else if (e.target.matches('.select-checkbox')) {
-                if (e.target.checked) {
-                    selectedTasks.add(taskId);
-                } else {
-                    selectedTasks.delete(taskId);
-                }
-                renderApp();
-            }
         });
 
         taskList.addEventListener('dblclick', (e) => {
@@ -195,11 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderApp() {
         const filteredTasks = TaskManager.getFilteredTasks(tasks, filter);
         renderTasks(filteredTasks, selectedTasks);
-        // Render the calendar in both places
         renderCalendar(tasks, 'desktop-calendar');
         renderCalendar(tasks, 'mobile-calendar');
     }
 
-    // Start the app
     App();
 });
