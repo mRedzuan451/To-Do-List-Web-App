@@ -1,5 +1,3 @@
-import { saveTasks } from './storage.js';
-
 export function addTask(tasks, newTaskData) {
     const newTask = {
         id: Date.now(),
