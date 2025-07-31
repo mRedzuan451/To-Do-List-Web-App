@@ -70,6 +70,7 @@ export function getFilter(filterButton) {
     return filterButton.dataset.filter;
 }
 
+// *** NEW, MORE RELIABLE CONFIRMATION FUNCTION ***
 export function getConfirm(message, callback) {
     const dialog = document.getElementById('confirm-dialog');
     const messageEl = document.getElementById('confirm-message');
@@ -84,22 +85,16 @@ export function getConfirm(message, callback) {
     messageEl.textContent = message;
     dialog.classList.remove('hidden');
 
-    const handleYes = () => {
-        callback(true);
-        cleanup();
-    };
-
-    const handleNo = () => {
-        callback(false);
-        cleanup();
-    };
-
-    // Use addEventListener for more reliable click handling
-    yesBtn.addEventListener('click', handleYes, { once: true });
-    noBtn.addEventListener('click', handleNo, { once: true });
-
-    function cleanup() {
+    // This creates a new, clean function for the "Yes" click
+    // It replaces any old listener that might be stuck
+    yesBtn.onclick = () => {
         dialog.classList.add('hidden');
-        // No need to remove listeners when using the { once: true } option
-    }
+        callback(true);
+    };
+
+    // Same for the "No" click
+    noBtn.onclick = () => {
+        dialog.classList.add('hidden');
+        callback(false);
+    };
 }
