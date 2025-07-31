@@ -1,12 +1,11 @@
 export function renderTasks(tasks, selectedTasks) {
     const taskList = document.getElementById('task-list');
-    const currentlyEditing = document.querySelector('.task-text[contenteditable="true"]');
-    
-    if (currentlyEditing) {
-        return;
-    }
+    if (!taskList) return;
 
-    taskList.innerHTML = ''; 
+    const currentlyEditing = document.querySelector('.task-text[contenteditable="true"]');
+    if (currentlyEditing) return;
+
+    taskList.innerHTML = '';
 
     if (tasks.length === 0) {
         taskList.innerHTML = '<p class="empty-message text-center text-gray-500 py-4">No tasks to show.</p>';
@@ -31,7 +30,6 @@ export function renderTasks(tasks, selectedTasks) {
                 <button class="delete-btn text-gray-400 hover:text-red-500 text-lg transition-colors" aria-label="Delete task">🗑️</button>
             </div>
         `;
-
         taskList.appendChild(taskItem);
     });
 }
@@ -57,9 +55,7 @@ export function clearInputs() {
     document.getElementById('link-input').value = '';
     
     const attachInput = document.getElementById('attach-input');
-    if (attachInput) {
-        attachInput.value = '';
-    }
+    if (attachInput) attachInput.value = '';
     
     document.getElementById('task-input').focus();
 }
@@ -70,31 +66,16 @@ export function getFilter(filterButton) {
     return filterButton.dataset.filter;
 }
 
-// *** NEW PROMISE-BASED CONFIRMATION FUNCTION ***
-export function getConfirm(message) {
-    return new Promise(resolve => {
-        const dialog = document.getElementById('confirm-dialog');
-        const messageEl = document.getElementById('confirm-message');
-        const yesBtn = document.getElementById('confirm-yes');
-        const noBtn = document.getElementById('confirm-no');
+// ** SIMPLIFIED FUNCTION - ONLY SHOWS THE DIALOG **
+export function showConfirm(message) {
+    const dialog = document.getElementById('confirm-dialog');
+    const messageEl = document.getElementById('confirm-message');
 
-        if (!dialog || !messageEl || !yesBtn || !noBtn) {
-            console.error('Confirmation dialog elements not found.');
-            resolve(false); // Resolve with false if the dialog is broken
-            return;
-        }
+    if (!dialog || !messageEl) {
+        console.error('Confirmation dialog elements not found.');
+        return;
+    }
 
-        messageEl.textContent = message;
-        dialog.classList.remove('hidden');
-
-        const controller = new AbortController();
-
-        yesBtn.addEventListener('click', () => resolve(true), { signal: controller.signal });
-        noBtn.addEventListener('click', () => resolve(false), { signal: controller.signal });
-
-    }).finally(() => {
-        // This code runs after the promise is resolved (user clicks Yes or No)
-        const dialog = document.getElementById('confirm-dialog');
-        if (dialog) dialog.classList.add('hidden');
-    });
+    messageEl.textContent = message;
+    dialog.classList.remove('hidden');
 }

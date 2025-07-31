@@ -1,5 +1,5 @@
 import { loadTasks } from './storage.js';
-import { renderTasks, getTaskInput, clearInputs, getFilter, getConfirm } from './ui.js';
+import { renderTasks, getTaskInput, clearInputs, getFilter, showConfirm } from './ui.js';
 import * as TaskManager from './tasks.js';
 import { renderCalendar } from './calendar.js';
 
@@ -8,41 +8,41 @@ document.addEventListener('DOMContentLoaded', () => {
     let filter = 'all';
     let selectedTasks = new Set();
     let draggedTaskId = null;
+    let actionToConfirm = null; // Stores the action to perform after confirmation
 
     function App() {
         renderApp();
 
         const taskList = document.getElementById('task-list');
-        const openCalendarBtn = document.getElementById('open-calendar-btn');
-        const closeCalendarBtn = document.getElementById('close-calendar-btn');
-        const calendarModal = document.getElementById('calendar-modal');
+        const confirmDialog = document.getElementById('confirm-dialog');
 
-        if(openCalendarBtn && closeCalendarBtn && calendarModal) {
-            openCalendarBtn.addEventListener('click', () => {
-                calendarModal.classList.remove('hidden');
-            });
-            closeCalendarBtn.addEventListener('click', () => {
-                calendarModal.classList.add('hidden');
-            });
-            calendarModal.addEventListener('click', (e) => {
-                if (e.target === calendarModal) {
-                    calendarModal.classList.add('hidden');
+        // --- SINGLE, RELIABLE LISTENER FOR THE CONFIRMATION DIALOG ---
+        confirmDialog.addEventListener('click', (e) => {
+            const dialog = e.currentTarget;
+            if (e.target.id === 'confirm-yes') {
+                if (actionToConfirm) {
+                    actionToConfirm(); // Execute the stored action
                 }
-            });
-        }
+                actionToConfirm = null; // Clear the action
+                dialog.classList.add('hidden');
+            } else if (e.target.id === 'confirm-no') {
+                actionToConfirm = null; // Clear the action
+                dialog.classList.add('hidden');
+            }
+        });
 
-        // Make the main click handler async to use await
-        taskList.addEventListener('click', async (e) => {
+        taskList.addEventListener('click', (e) => {
             const taskItem = e.target.closest('.task-item');
             if (!taskItem) return;
             const taskId = taskItem.dataset.id;
 
             if (e.target.matches('.delete-btn')) {
-                const confirmed = await getConfirm('Are you sure you want to delete this task?');
-                if (confirmed) {
+                // Store the delete action, then show the dialog
+                actionToConfirm = () => {
                     tasks = TaskManager.deleteTask(tasks, taskId);
                     renderApp();
-                }
+                };
+                showConfirm('Are you sure you want to delete this task?');
             } else if (e.target.matches('.task-checkbox')) {
                 tasks = TaskManager.toggleTask(tasks, taskId);
                 renderApp();
@@ -56,6 +56,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        document.getElementById('delete-selected-btn').addEventListener('click', () => {
+            if (selectedTasks.size === 0) return;
+            actionToConfirm = () => {
+                tasks = TaskManager.deleteMultipleTasks(tasks, selectedTasks);
+                selectedTasks.clear();
+                renderApp();
+            };
+            showConfirm('Delete selected tasks?');
+        });
+
+        document.getElementById('clear-completed').addEventListener('click', () => {
+            actionToConfirm = () => {
+                tasks = TaskManager.clearCompletedTasks(tasks);
+                renderApp();
+            };
+            showConfirm('Clear all completed tasks?');
+        });
+
+        // Other event listeners...
         document.getElementById('add-task-btn').addEventListener('click', () => {
             const input = getTaskInput();
             if (input.text) {
@@ -151,29 +170,11 @@ document.addEventListener('DOMContentLoaded', () => {
             renderApp();
         });
 
-        document.getElementById('delete-selected-btn').addEventListener('click', async () => {
-            if (selectedTasks.size === 0) return;
-            const confirmed = await getConfirm('Delete selected tasks?');
-            if(confirmed) {
-                tasks = TaskManager.deleteMultipleTasks(tasks, selectedTasks);
-                selectedTasks.clear();
-                renderApp();
-            }
-        });
-
         document.getElementById('complete-selected-btn').addEventListener('click', () => {
             if (selectedTasks.size === 0) return;
             tasks = TaskManager.completeMultipleTasks(tasks, selectedTasks);
             selectedTasks.clear();
             renderApp();
-        });
-
-        document.getElementById('clear-completed').addEventListener('click', async () => {
-            const confirmed = await getConfirm('Clear all completed tasks?');
-            if (confirmed) {
-                tasks = TaskManager.clearCompletedTasks(tasks);
-                renderApp();
-            }
         });
 
         document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -183,6 +184,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
+        }
+
+        const openCalendarBtn = document.getElementById('open-calendar-btn');
+        const closeCalendarBtn = document.getElementById('close-calendar-btn');
+        const calendarModal = document.getElementById('calendar-modal');
+        if(openCalendarBtn && closeCalendarBtn && calendarModal) {
+            openCalendarBtn.addEventListener('click', () => calendarModal.classList.remove('hidden'));
+            closeCalendarBtn.addEventListener('click', () => calendarModal.classList.add('hidden'));
+            calendarModal.addEventListener('click', (e) => {
+                if(e.target === calendarModal) calendarModal.classList.add('hidden');
+            });
         }
     }
 
