@@ -1,5 +1,5 @@
 import { loadTasks } from './storage.js';
-import { renderTasks, getTaskInput, clearInputs, getFilter, getSelectedTaskIds, getConfirm } from './ui.js';
+import { renderTasks, getTaskInput, clearInputs, getFilter, getConfirm } from './ui.js';
 import * as TaskManager from './tasks.js';
 
 let tasks = loadTasks();
