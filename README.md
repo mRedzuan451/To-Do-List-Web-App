@@ -1,3 +1,54 @@
+# To-Do List Web App
+
+A modern, feature-rich To-Do List web application built with HTML, CSS, and JavaScript.
+
+## Features
+
+ - **Add, edit, and delete tasks**
+ - **Main tasks and subtasks** (parent/child hierarchy)
+ - **Task notes/description**
+ - **Due dates and overdue highlighting**
+ - **Priority/color coding**
+ - **Bulk actions** (select, delete, complete)
+ - **Drag-and-drop reordering**
+ - **Collapsible subtasks**
+ - **Progress bar**
+ - **Filter by all/active/completed**
+ - **Export/import tasks (JSON)**
+ - **Dark mode toggle**
+ - **Accessibility (keyboard navigation, ARIA labels)**
+ - **Confirmation dialogs for destructive actions**
+ - **Attachments and links** (file names only, demo purpose)
+ - **Responsive, modern UI**
+
+## Planned/Upcoming Features
+
+ - **Reminders/notifications for due dates**
+ - **Recurring tasks (daily, weekly, etc.)**
+
+## Usage
+
+1. Open `index.html` in your browser.
+2. Add tasks using the input section. You can specify description, due date, priority, attach files (names only), and add a link.
+3. Click a main task to view/add subtasks.
+4. Use the filter buttons to view all, active, or completed tasks.
+5. Use the bulk action buttons to select, delete, or complete multiple tasks.
+6. Export or import your tasks as JSON.
+7. Toggle dark mode with the sun/moon button.
+
+## Accessibility
+ - All controls are keyboard accessible.
+ - ARIA labels and roles are provided for screen readers.
+
+## Data Storage
+ - Tasks are saved in your browser's localStorage.
+
+## Development
+ - All logic is in modular JavaScript files (`app.js`, `storage.js`, `tasks.js`, `ui.js`, `main.js`).
+ - UI is styled with modern CSS (Flexbox, Grid, custom properties).
+
+## License
+MIT License
 # Simple To-Do List Web App
 
 A clean, intuitive, and responsive web application for managing daily tasks. This project was built to practice and showcase core JavaScript concepts, including DOM manipulation, event handling, and client-side storage.
