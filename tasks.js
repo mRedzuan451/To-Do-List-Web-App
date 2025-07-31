@@ -1,20 +1,70 @@
-// tasks.js: Task logic
 import { saveTasks } from './storage.js';
 
-export function addTask(tasks, newTask) {
-    tasks.push(newTask);
-    saveTasks(tasks);
+export function addTask(tasks, taskData) {
+    const newTask = {
+        id: String(Date.now()), // Use string IDs for consistency
+        text: taskData.text,
+        completed: false,
+        dueDate: taskData.dueDate,
+        priority: taskData.priority,
+        description: taskData.description,
+        link: taskData.link,
+        attachments: taskData.attachments || [],
+    };
+    const newTasks = [...tasks, newTask];
+    saveTasks(newTasks);
+    return newTasks;
 }
-export function editTask(tasks, idx, newText) {
-    tasks[idx].text = newText;
-    saveTasks(tasks);
+
+export function deleteTask(tasks, id) {
+    const newTasks = tasks.filter(task => task.id !== id);
+    saveTasks(newTasks);
+    return newTasks;
 }
-export function deleteTask(tasks, idx) {
-    tasks.splice(idx, 1);
-    saveTasks(tasks);
+
+export function toggleTask(tasks, id) {
+    const newTasks = tasks.map(task => {
+        if (task.id === id) {
+            return { ...task, completed: !task.completed };
+        }
+        return task;
+    });
+    saveTasks(newTasks);
+    return newTasks;
 }
-export function toggleTask(tasks, idx) {
-    tasks[idx].completed = !tasks[idx].completed;
-    saveTasks(tasks);
+
+export function clearCompletedTasks(tasks) {
+    const newTasks = tasks.filter(task => !task.completed);
+    saveTasks(newTasks);
+    return newTasks;
 }
-// Add more task logic as needed (rollup, etc)
+
+export function deleteMultipleTasks(tasks, selectedIds) {
+    const newTasks = tasks.filter(task => !selectedIds.has(task.id));
+    saveTasks(newTasks);
+    return newTasks;
+}
+
+export function completeMultipleTasks(tasks, selectedIds) {
+    const newTasks = tasks.map(task => {
+        if (selectedIds.has(task.id)) {
+            return { ...task, completed: true };
+        }
+        return task;
+    });
+    saveTasks(newTasks);
+    return newTasks;
+}
+
+
+export function getFilteredTasks(tasks, filter) {
+    switch (filter) {
+        case 'active':
+            return tasks.filter(task => !task.completed);
+        case 'completed':
+            return tasks.filter(task => task.completed);
+        case 'all':
+        default:
+            return tasks;
+    }
+}

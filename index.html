@@ -14,9 +14,9 @@
         </header>
         <form class="input-section" onsubmit="return false;">
             <div class="input-fields">
-                <label for="task-input" style="display:none;">Task</label>
+                <label for="task-input" class="sr-only">Task</label>
                 <input type="text" id="task-input" placeholder="Add a new task..." aria-label="Task title">
-                <label for="due-date-input" style="display:none;">Due Date</label>
+                <label for="due-date-input" class="sr-only">Due Date</label>
                 <input type="date" id="due-date-input" aria-label="Due date">
                 <select id="priority-input" aria-label="Priority">
                     <option value="none">No Priority</option>
@@ -58,11 +58,13 @@
             <div class="modal-content">
                 <h2 id="confirm-title">Are you sure?</h2>
                 <p id="confirm-message"></p>
-                <button id="confirm-yes">Yes</button>
-                <button id="confirm-no">No</button>
+                <div class="modal-buttons">
+                    <button id="confirm-yes">Yes</button>
+                    <button id="confirm-no">No</button>
+                </div>
             </div>
         </div>
     </div>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
