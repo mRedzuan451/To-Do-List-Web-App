@@ -1,3 +1,12 @@
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+}
+
+
 export function renderTasks(tasks, selectedTasks) {
     const taskList = document.getElementById('task-list');
     if (!taskList) return;
@@ -19,6 +28,9 @@ export function renderTasks(tasks, selectedTasks) {
         taskItem.dataset.id = task.id;
         taskItem.draggable = true;
 
+        const isTimerRunning = task.timerStartTime !== null;
+        const totalElapsedTime = task.elapsedTime + (isTimerRunning ? Date.now() - task.timerStartTime : 0);
+
         taskItem.innerHTML = `
             <div class="flex items-center flex-grow gap-3">
                 <input type="checkbox" class="select-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-600" ${isSelected ? 'checked' : ''} aria-label="Select task">
@@ -26,6 +38,10 @@ export function renderTasks(tasks, selectedTasks) {
                 <span class="task-text flex-grow cursor-pointer outline-none focus:outline-blue-500 rounded px-1" tabindex="0">${task.text}</span>
             </div>
             <div class="task-actions flex items-center gap-2">
+                <span class="timer-display text-sm font-mono">${formatTime(totalElapsedTime)}</span>
+                <button class="timer-btn text-gray-400 hover:text-green-500 text-lg transition-colors" aria-label="${isTimerRunning ? 'Stop timer' : 'Start timer'}">
+                    <i class="fas ${isTimerRunning ? 'fa-pause-circle' : 'fa-play-circle'}"></i>
+                </button>
                 ${task.dueDate ? `<span class="due-date text-xs text-gray-500 dark:text-gray-400">${task.dueDate}</span>` : ''}
                 <button class="delete-btn text-gray-400 hover:text-red-500 text-lg transition-colors" aria-label="Delete task">🗑️</button>
             </div>

@@ -2,7 +2,7 @@ import { saveTasks } from './storage.js';
 
 export function addTask(tasks, taskData) {
     const newTask = {
-        id: String(Date.now()), // Use string IDs for consistency
+        id: String(Date.now()),
         text: taskData.text,
         completed: false,
         dueDate: taskData.dueDate,
@@ -10,6 +10,8 @@ export function addTask(tasks, taskData) {
         description: taskData.description,
         link: taskData.link,
         attachments: taskData.attachments || [],
+        elapsedTime: 0, // Time in milliseconds
+        timerStartTime: null, // Timestamp when the timer was started
     };
     const newTasks = [...tasks, newTask];
     saveTasks(newTasks);
@@ -17,15 +19,14 @@ export function addTask(tasks, taskData) {
 }
 
 export function deleteTask(tasks, id) {
-    // Use != instead of !== to allow for type coercion between number and string
-    const newTasks = tasks.filter(task => task.id != id); // <-- Change is here
+    const newTasks = tasks.filter(task => task.id != id);
     saveTasks(newTasks);
     return newTasks;
 }
 
 export function toggleTask(tasks, id) {
     const newTasks = tasks.map(task => {
-        if (task.id === id) {
+        if (task.id == id) {
             return { ...task, completed: !task.completed };
         }
         return task;
@@ -36,7 +37,7 @@ export function toggleTask(tasks, id) {
 
 export function editTask(tasks, id, newText) {
     const newTasks = tasks.map(task => {
-        if (task.id === id) {
+        if (task.id == id) {
             return { ...task, text: newText };
         }
         return task;
@@ -46,8 +47,8 @@ export function editTask(tasks, id, newText) {
 }
 
 export function reorderTask(tasks, fromId, toId) {
-    const fromIndex = tasks.findIndex(task => task.id === fromId);
-    const toIndex = tasks.findIndex(task => task.id === toId);
+    const fromIndex = tasks.findIndex(task => task.id == fromId);
+    const toIndex = tasks.findIndex(task => task.id == toId);
 
     const newTasks = [...tasks];
     const [movedTask] = newTasks.splice(fromIndex, 1);
@@ -65,7 +66,6 @@ export function clearCompletedTasks(tasks) {
 }
 
 export function deleteMultipleTasks(tasks, selectedIds) {
-    // Convert task.id to a string before the check
     const newTasks = tasks.filter(task => !selectedIds.has(String(task.id)));
     saveTasks(newTasks);
     return newTasks;
@@ -73,7 +73,6 @@ export function deleteMultipleTasks(tasks, selectedIds) {
 
 export function completeMultipleTasks(tasks, selectedIds) {
     const newTasks = tasks.map(task => {
-        // Convert task.id to a string before the check
         if (selectedIds.has(String(task.id))) {
             return { ...task, completed: true };
         }
@@ -82,6 +81,7 @@ export function completeMultipleTasks(tasks, selectedIds) {
     saveTasks(newTasks);
     return newTasks;
 }
+
 
 export function getFilteredTasks(tasks, filter) {
     switch (filter) {
@@ -93,4 +93,31 @@ export function getFilteredTasks(tasks, filter) {
         default:
             return tasks;
     }
+}
+
+export function startTimer(tasks, id) {
+    const newTasks = tasks.map(task => {
+        if (task.id == id) {
+            // Stop any other running timers
+            if (task.timerStartTime) {
+                return { ...task };
+            }
+            return { ...task, timerStartTime: Date.now() };
+        }
+        return task;
+    });
+    saveTasks(newTasks);
+    return newTasks;
+}
+
+export function stopTimer(tasks, id) {
+    const newTasks = tasks.map(task => {
+        if (task.id == id) {
+            const elapsed = task.elapsedTime + (Date.now() - task.timerStartTime);
+            return { ...task, elapsedTime: elapsed, timerStartTime: null };
+        }
+        return task;
+    });
+    saveTasks(newTasks);
+    return newTasks;
 }

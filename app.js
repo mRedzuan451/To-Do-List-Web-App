@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedTasks = new Set();
     let draggedTaskId = null;
     let actionToConfirm = null; // Stores the action to perform after confirmation
+    let timerInterval = null;
 
     function App() {
         renderApp();
@@ -32,15 +33,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         taskList.addEventListener('click', (e) => {
-            console.log('Task list clicked!'); // <-- Add this line
             const taskItem = e.target.closest('.task-item');
             if (!taskItem) return;
             const taskId = taskItem.dataset.id;
 
-            if (e.target.matches('.delete-btn')) {
-                console.log('Delete button clicked for task ID:', taskId);                // Store the delete action, then show the dialog
+            if (e.target.closest('.timer-btn')) {
+                const task = tasks.find(t => t.id == taskId);
+                if (task) {
+                    if (task.timerStartTime) {
+                        tasks = TaskManager.stopTimer(tasks, taskId);
+                    } else {
+                        tasks = TaskManager.startTimer(tasks, taskId);
+                    }
+                    renderApp();
+                }
+            } else if (e.target.matches('.delete-btn')) {
+                // Store the delete action, then show the dialog
                 actionToConfirm = () => {
-                    console.log('Confirmation received, deleting task:', taskId);
                     tasks = TaskManager.deleteTask(tasks, taskId);
                     renderApp();
                 };
@@ -200,11 +209,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updateTimers() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        const activeTask = tasks.find(task => task.timerStartTime);
+
+        if (activeTask) {
+            timerInterval = setInterval(() => {
+                const taskItem = document.querySelector(`.task-item[data-id='${activeTask.id}'] .timer-display`);
+                if (taskItem) {
+                    const totalElapsedTime = activeTask.elapsedTime + (Date.now() - activeTask.timerStartTime);
+                    const totalSeconds = Math.floor(totalElapsedTime / 1000);
+                    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+                    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+                    const seconds = String(totalSeconds % 60).padStart(2, '0');
+                    taskItem.textContent = `${hours}:${minutes}:${seconds}`;
+                }
+            }, 1000);
+        }
+    }
+
     function renderApp() {
         const filteredTasks = TaskManager.getFilteredTasks(tasks, filter);
         renderTasks(filteredTasks, selectedTasks);
         renderCalendar(tasks, 'desktop-calendar');
         renderCalendar(tasks, 'mobile-calendar');
+        updateTimers();
     }
 
     App();
