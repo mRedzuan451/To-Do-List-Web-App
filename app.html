@@ -21,6 +21,29 @@
             text-decoration: line-through;
             color: #9ca3af; /* gray-400 */
         }
+        
+        .date-input-placeholder {
+            position: relative;
+            color: transparent; /* Hide the default browser text (e.g., "mm/dd/yyyy") */
+        }
+
+        .date-input-placeholder::before {
+            content: attr(data-placeholder);
+            position: absolute;
+            left: 1rem; /* Adjust as needed */
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af; /* Placeholder text color (gray-400) */
+            pointer-events: none;
+        }
+
+        .date-input-placeholder.has-value::before {
+            display: none; /* Hide the placeholder when a date is selected */
+        }
+
+        .date-input-placeholder.has-value {
+             color: inherit; /* Show the actual date text */
+        }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -46,8 +69,9 @@
                         <div class="md:col-span-3"> <label for="task-input" class="sr-only">Task</label>
                             <input type="text" id="task-input" placeholder="Add a new task..." aria-label="Task title" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                         </div>
-                        <div class="md:col-span-2"> <label for="due-date-input" class="sr-only">Due date</label>
-                            <input type="date" id="due-date-input" aria-label="Due date" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                        <div class="md:col-span-2">
+                            <label for="due-date-input" class="sr-only">Due date</label>
+                            <input type="date" id="due-date-input" data-placeholder="Due date" aria-label="Due date" class="date-input-placeholder w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                         </div>
                         <div>
                             <label for="priority-input" class="sr-only">Priority</label>

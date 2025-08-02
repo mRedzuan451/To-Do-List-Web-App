@@ -241,4 +241,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     App();
+
+    const dueDateInput = document.getElementById('due-date-input');
+    
+    function updatePlaceholder() {
+        if (dueDateInput.value) {
+            dueDateInput.classList.add('has-value');
+        } else {
+            dueDateInput.classList.remove('has-value');
+        }
+    }
+
+    dueDateInput.addEventListener('change', updatePlaceholder);
+
+    // Also check on page load in case a value is pre-filled
+    updatePlaceholder();
 });
