@@ -65,14 +65,16 @@ export function clearCompletedTasks(tasks) {
 }
 
 export function deleteMultipleTasks(tasks, selectedIds) {
-    const newTasks = tasks.filter(task => !selectedIds.has(task.id));
+    // Convert task.id to a string before the check
+    const newTasks = tasks.filter(task => !selectedIds.has(String(task.id)));
     saveTasks(newTasks);
     return newTasks;
 }
 
 export function completeMultipleTasks(tasks, selectedIds) {
     const newTasks = tasks.map(task => {
-        if (selectedIds.has(task.id)) {
+        // Convert task.id to a string before the check
+        if (selectedIds.has(String(task.id))) {
             return { ...task, completed: true };
         }
         return task;
@@ -80,7 +82,6 @@ export function completeMultipleTasks(tasks, selectedIds) {
     saveTasks(newTasks);
     return newTasks;
 }
-
 
 export function getFilteredTasks(tasks, filter) {
     switch (filter) {
