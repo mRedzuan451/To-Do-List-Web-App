@@ -1,28 +1,35 @@
 const CACHE_NAME = 'to-do-list-cache-v1';
-const urlsToCache = [
+const localUrlsToCache = [
   '/',
   '/app.html',
   '/app.js',
   '/ui.js',
   '/tasks.js',
   '/storage.js',
-  '/calendar.js',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'
+  '/calendar.js'
 ];
 
-// Install a service worker
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
+      .then(cache => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // Fetch and cache third-party resources separately
+        const thirdPartyRequests = [
+          new Request('https://cdn.tailwindcss.com', { mode: 'no-cors' }),
+          new Request('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css', { mode: 'no-cors' })
+        ];
+
+        thirdPartyRequests.forEach(request => {
+          fetch(request).then(response => cache.put(request, response));
+        });
+        
+        // Cache local files
+        return cache.addAll(localUrlsToCache);
       })
   );
 });
 
-// Cache and return requests
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
