@@ -21,8 +21,10 @@ function createTaskElement(task, selectedTasks) {
     taskItem.innerHTML = `
         <div class="flex items-center w-full">
             <div class="flex items-center flex-grow gap-3">
-                <input type="checkbox" class="select-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-600" ${isSelected ? 'checked' : ''} aria-label="Select task">
-                <input type="checkbox" class="task-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-600" ${task.completed ? 'checked' : ''} aria-label="Mark task complete">
+                <input type="checkbox" class="select-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500" ${isSelected ? 'checked' : ''} aria-label="Select task" title="Select for bulk actions">
+                
+                <input type="checkbox" class="task-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500" ${task.completed ? 'checked' : ''} aria-label="Mark task complete" title="Mark as complete">
+                
                 <span class="task-text flex-grow cursor-pointer outline-none focus:outline-blue-500 rounded px-1" tabindex="0">${task.text}</span>
             </div>
             <div class="task-actions flex items-center gap-3">
