@@ -235,9 +235,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderApp() {
         const filteredTasks = TaskManager.getFilteredTasks(tasks, filter);
         renderTasks(filteredTasks, selectedTasks);
+        updateTaskCount(tasks);
         renderCalendar(tasks, 'desktop-calendar');
         renderCalendar(tasks, 'mobile-calendar');
         updateTimers();
+    }
+
+    function updateTaskCount(tasks) {
+        const taskCountEl = document.getElementById('task-count');
+        if (!taskCountEl) return;
+
+        // Filter for tasks that are not yet completed
+        const activeTasksCount = tasks.filter(task => !task.completed).length;
+        
+        // Update the text, and handle plural "task" vs "tasks"
+        taskCountEl.textContent = `${activeTasksCount} task${activeTasksCount !== 1 ? 's' : ''} left`;
     }
 
     App();
