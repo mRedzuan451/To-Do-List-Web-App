@@ -1,12 +1,13 @@
-const CACHE_NAME = 'to-do-list-cache-v2'; // Increment the version
+const CACHE_NAME = 'to-do-list-cache-v4';
 const urlsToCache = [
   '/',
-  '/app.html',
-  '/app.js',
-  '/ui.js',
-  '/tasks.js',
-  '/storage.js',
-  '/calendar.js'
+  '/app.html?v=1.0.1',
+  '/app.js?v=1.0.1',
+  '/ui.js?v=1.0.1',
+  '/tasks.js?v=1.0.1',
+  '/storage.js?v=1.0.1',
+  '/calendar.js?v=1.0.1',
+  '/manifest.json?v=1.0.1' // Also cache the manifest
 ];
 
 self.addEventListener('install', event => {
