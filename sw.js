@@ -1,5 +1,5 @@
-const CACHE_NAME = 'to-do-list-cache-v1';
-const localUrlsToCache = [
+const CACHE_NAME = 'to-do-list-cache-v2'; // Increment the version
+const urlsToCache = [
   '/',
   '/app.html',
   '/app.js',
@@ -12,34 +12,29 @@ const localUrlsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        // Fetch and cache third-party resources separately
-        const thirdPartyRequests = [
-          new Request('https://cdn.tailwindcss.com', { mode: 'no-cors' }),
-          new Request('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css', { mode: 'no-cors' })
-        ];
+      .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting()) // Activate new SW immediately
+  );
+});
 
-        thirdPartyRequests.forEach(request => {
-          fetch(request).then(response => cache.put(request, response));
-        });
-        
-        // Cache local files
-        return cache.addAll(localUrlsToCache);
-      })
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName); // Delete old caches
+          }
+        })
+      );
+    })
   );
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
-      .then(function(response) {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+      .then(response => response || fetch(event.request))
   );
 });

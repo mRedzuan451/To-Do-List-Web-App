@@ -255,4 +255,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     dueDateInput.addEventListener('change', updatePlaceholder);
     updatePlaceholder();
+
+    // --- Place this code at the end of app.js ---
+
+    function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then(registration => {
+                registration.onupdatefound = () => {
+                    const installingWorker = registration.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    // A new version is installed and ready.
+                                    showUpdateNotification();
+                                }
+                            }
+                        };
+                    }
+                };
+            }).catch(error => {
+                console.error('Service Worker registration failed:', error);
+            });
+        }
+    }
+
+    function showUpdateNotification() {
+        const notification = document.getElementById('update-notification');
+        const reloadButton = document.getElementById('reload-button');
+        if(notification) {
+            notification.classList.remove('hidden');
+            reloadButton.onclick = () => {
+                window.location.reload();
+            };
+        }
+    }
+
+    registerServiceWorker();
 });
