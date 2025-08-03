@@ -34,7 +34,14 @@ export function addTask(tasks, taskData) {
 export function addSubtask(tasks, parentId, subtaskData) {
     const newTasks = JSON.parse(JSON.stringify(tasks)); // Deep copy
     const parentTask = findTask(newTasks, parentId);
+
     if (parentTask) {
+        // --- FIX: Ensure the subtasks array exists before using it ---
+        if (!parentTask.subtasks) {
+            parentTask.subtasks = [];
+        }
+        // --- End of Fix ---
+
         const newSubtask = {
             id: String(Date.now()),
             text: subtaskData.text,
@@ -45,6 +52,7 @@ export function addSubtask(tasks, parentId, subtaskData) {
             priority: 'none',
             elapsedTime: 0,
             timerStartTime: null,
+            subtasks: [] // Also good practice to add here for consistency
         };
         parentTask.subtasks.push(newSubtask);
     }
