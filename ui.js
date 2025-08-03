@@ -21,20 +21,14 @@ function createTaskElement(task, selectedTasks) {
     taskItem.innerHTML = `
         <div class="flex items-center w-full">
             <div class="flex items-center flex-grow gap-3">
-                <input type="checkbox" class="select-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-600" ${isSelected ? 'checked' : ''} aria-label="Select task">
-                <input type="checkbox" class="task-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-600" ${task.completed ? 'checked' : ''} aria-label="Mark task complete">
+                <input type="checkbox" class="select-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500" ${isSelected ? 'checked' : ''} aria-label="Select task" title="Select for bulk actions">
+                
+                <input type="checkbox" class="task-checkbox form-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500" ${task.completed ? 'checked' : ''} aria-label="Mark task complete" title="Mark as complete">
+                
                 <span class="task-text flex-grow cursor-pointer outline-none focus:outline-blue-500 rounded px-1" tabindex="0">${task.text}</span>
             </div>
             <div class="task-actions flex items-center gap-3">
-                 ${!task.parentId ? `<button class="add-subtask-btn text-gray-400 hover:text-blue-500 text-lg" aria-label="Add subtask"><i class="fas fa-plus"></i></button>` : ''}
-                <span class="timer-display text-sm font-mono">${formatTime(totalElapsedTime)}</span>
-                <button class="timer-btn text-gray-400 hover:text-green-500 text-lg transition-colors" aria-label="${isTimerRunning ? 'Stop timer' : 'Start timer'}">
-                    <i class="fas ${isTimerRunning ? 'fa-pause-circle' : 'fa-play-circle'}"></i>
-                </button>
-                ${task.dueDate ? `<span class="due-date text-xs text-gray-500 dark:text-gray-400">${task.dueDate}</span>` : ''}
-                <button class="delete-btn text-gray-400 hover:text-red-500 text-lg transition-colors" aria-label="Delete task">🗑️</button>
-                ${hasSubtasks ? `<button class="toggle-subtasks-btn text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg"><i class="fas fa-chevron-down"></i></button>` : ''}
-            </div>
+                 </div>
         </div>
         ${hasSubtasks ? `<ul class="subtask-list pl-8 pt-2" style="display: none;"></ul>` : ''}
     `;
