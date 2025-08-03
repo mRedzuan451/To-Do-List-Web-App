@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let filter = 'all';
     let selectedTasks = new Set();
     let draggedTaskId = null;
-    let actionToConfirm = null; // Stores the action to perform after confirmation
+    let actionToConfirm = null;
     let timerInterval = null;
 
     function App() {
@@ -17,17 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const taskList = document.getElementById('task-list');
         const confirmDialog = document.getElementById('confirm-dialog');
 
-        // --- SINGLE, RELIABLE LISTENER FOR THE CONFIRMATION DIALOG ---
         confirmDialog.addEventListener('click', (e) => {
             const dialog = e.currentTarget;
             if (e.target.id === 'confirm-yes') {
-                if (actionToConfirm) {
-                    actionToConfirm(); // Execute the stored action
-                }
-                actionToConfirm = null; // Clear the action
+                if (actionToConfirm) actionToConfirm();
+                actionToConfirm = null;
                 dialog.classList.add('hidden');
             } else if (e.target.id === 'confirm-no') {
-                actionToConfirm = null; // Clear the action
+                actionToConfirm = null;
                 dialog.classList.add('hidden');
             }
         });
@@ -37,18 +34,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!taskItem) return;
             const taskId = taskItem.dataset.id;
 
-            if (e.target.closest('.timer-btn')) {
-                const task = tasks.find(t => t.id == taskId);
+            if (e.target.closest('.add-subtask-btn')) {
+                const subtaskText = prompt('Enter subtask:');
+                if (subtaskText) {
+                    tasks = TaskManager.addSubtask(tasks, taskId, { text: subtaskText });
+                    renderApp();
+                }
+            } else if (e.target.closest('.toggle-subtasks-btn')) {
+                const sublist = taskItem.querySelector('.subtask-list');
+                const icon = e.target.closest('.toggle-subtasks-btn').querySelector('i');
+                if (sublist) {
+                    const isHidden = sublist.style.display === 'none';
+                    sublist.style.display = isHidden ? 'block' : 'none';
+                    icon.classList.toggle('fa-chevron-down', !isHidden);
+                    icon.classList.toggle('fa-chevron-up', isHidden);
+                }
+            } else if (e.target.closest('.timer-btn')) {
+                const task = TaskManager.findTask(tasks, taskId);
                 if (task) {
-                    if (task.timerStartTime) {
-                        tasks = TaskManager.stopTimer(tasks, taskId);
-                    } else {
-                        tasks = TaskManager.startTimer(tasks, taskId);
-                    }
+                    tasks = task.timerStartTime ? TaskManager.stopTimer(tasks, taskId) : TaskManager.startTimer(tasks, taskId);
                     renderApp();
                 }
             } else if (e.target.matches('.delete-btn')) {
-                // Store the delete action, then show the dialog
                 actionToConfirm = () => {
                     tasks = TaskManager.deleteTask(tasks, taskId);
                     renderApp();
@@ -85,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showConfirm('Clear all completed tasks?');
         });
 
-        // Other event listeners...
         document.getElementById('add-task-btn').addEventListener('click', () => {
             const input = getTaskInput();
             if (input.text) {
@@ -95,9 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('clear-inputs-btn').addEventListener('click', () => {
-            clearInputs();
-        });
+        document.getElementById('clear-inputs-btn').addEventListener('click', clearInputs);
 
         taskList.addEventListener('dblclick', (e) => {
             if (e.target.matches('.task-text')) {
@@ -123,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderApp();
                 };
                 
-                taskTextSpan.addEventListener('blur', saveChanges);
+                taskTextSpan.addEventListener('blur', saveChanges, { once: true });
                 taskTextSpan.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
@@ -132,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         taskTextSpan.textContent = originalText;
                         taskTextSpan.blur();
                     }
-                }, { once: true });
+                });
             }
         });
 
@@ -143,9 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        taskList.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        });
+        taskList.addEventListener('dragover', (e) => { e.preventDefault(); });
 
         taskList.addEventListener('drop', (e) => {
             e.preventDefault();
@@ -210,13 +212,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateTimers() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
+        if (timerInterval) clearInterval(timerInterval);
 
-        const activeTask = tasks.find(task => task.timerStartTime);
-
+        const activeTask = TaskManager.findTask(tasks, tasks.find(t => t.timerStartTime)?.id);
+        
         if (activeTask) {
             timerInterval = setInterval(() => {
                 const taskItem = document.querySelector(`.task-item[data-id='${activeTask.id}'] .timer-display`);
@@ -231,6 +230,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
         }
     }
+    
+    function updateTaskCount(tasks) {
+        const taskCountEl = document.getElementById('task-count');
+        if (!taskCountEl) return;
+        const activeTasksCount = tasks.filter(task => !task.completed).length;
+        taskCountEl.textContent = `${activeTasksCount} task${activeTasksCount !== 1 ? 's' : ''} left`;
+    }
 
     function renderApp() {
         const filteredTasks = TaskManager.getFilteredTasks(tasks, filter);
@@ -241,31 +247,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTimers();
     }
 
-    function updateTaskCount(tasks) {
-        const taskCountEl = document.getElementById('task-count');
-        if (!taskCountEl) return;
-
-        // Filter for tasks that are not yet completed
-        const activeTasksCount = tasks.filter(task => !task.completed).length;
-        
-        // Update the text, and handle plural "task" vs "tasks"
-        taskCountEl.textContent = `${activeTasksCount} task${activeTasksCount !== 1 ? 's' : ''} left`;
-    }
-
     App();
-
-    const dueDateInput = document.getElementById('due-date-input');
     
+    const dueDateInput = document.getElementById('due-date-input');
     function updatePlaceholder() {
-        if (dueDateInput.value) {
-            dueDateInput.classList.add('has-value');
-        } else {
-            dueDateInput.classList.remove('has-value');
-        }
+        dueDateInput.classList.toggle('has-value', !!dueDateInput.value);
     }
-
     dueDateInput.addEventListener('change', updatePlaceholder);
-
-    // Also check on page load in case a value is pre-filled
     updatePlaceholder();
 });
