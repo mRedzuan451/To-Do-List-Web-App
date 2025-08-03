@@ -1,6 +1,6 @@
 import { saveTasks } from './storage.js';
 
-function findTask(tasks, id) {
+export function findTask(tasks, id) {
     for (const task of tasks) {
         if (task.id == id) return task;
         if (task.subtasks && task.subtasks.length > 0) {
